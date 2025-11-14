@@ -3,12 +3,12 @@
 @section('content')
     <div class="page-header">
         <div class="page-title">
-            <h4>Mobil Client List</h4>
-            <h6>Manage Mobil Cleint</h6>
+            <h4>Kendaraan Client List</h4>
+            <h6>Manage Kendaraan Cleint</h6>
         </div>
         <div class="page-btn d-flex justify-content-between align-items-center gap-2">
             <button class="btn btn-added mr-1" id="add-client-btn">+ Add Client</button>
-            <button class="btn btn-added" id="btn-add">+ Add Mobil Client</button>
+            <button class="btn btn-added" id="btn-add">+ Add Kendaraan Client</button>
         </div>
 
     </div>

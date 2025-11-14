@@ -138,7 +138,7 @@
                     <small>Kode Sistem: {{ $barang->id_barang ?? '-' }}</small><br>
                     <small>Kode Part: {{ $barang->kode_barang ?? '-' }}</small><br>
                     <small>Merk: {{ $barang->merk_barang ?? '-' }}</small><br>
-                    <small>Jenis Mobil: {{ $barang->jenis ?? '-' }}</small><br>
+                    <small>Jenis Kendaraan: {{ $barang->jenis ?? '-' }}</small><br>
                     <small>Ket: {{ $barang->keterangan ?? '-' }}</small><br>
                     <small class="harga">
                         {{ $barang->harga_jual ? 'Rp ' . number_format($barang->harga_jual, 0, ',', '.') : '-' }}

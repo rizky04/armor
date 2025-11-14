@@ -73,7 +73,7 @@
                  @can('menu-kendaraan')
                      <li class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">
                          <a href="{{ route('vehicles.index') }}"><i class="fa fa-car"></i><span>
-                                 Mobil Client</span> </a>
+                                 Kendaraan Client</span> </a>
                      </li>
                  @endcan
                  @can('menu-service')

@@ -73,7 +73,7 @@
                          <th>Total Terjual</th> <!-- BARU -->
     <th>Total Penjualan</th> <!-- BARU -->
                         <th>Distributor</th>
-                        <th>Jenis Mobil</th>
+                        <th>Jenis Kendaraan</th>
                     </tr>
                 </thead>
                 <tbody></tbody>

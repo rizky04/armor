@@ -37,7 +37,7 @@
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label for="photo">Foto Mobil Customer (opsional)</label>
+                                <label for="photo">Foto Kendaraan Customer (opsional)</label>
                                 <input type="file" id="photo" name="photo" class="form-control">
                                 <small id="error-photo" class="text-danger"></small>
                                  {{-- Preview Foto --}}
