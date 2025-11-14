@@ -27,7 +27,7 @@
 
     <!-- HEADER -->
     <div class="text-center">
-        <h5 class="bold mb-1">KARISMA MOTOR</h5>
+        <h5 class="bold mb-1">ARMOR MOTOR</h5>
         <p class="mb-1">Jl. Raya Nyorondung No. 96, Pamorah, Bangkalan</p>
         <p class="mb-1">Telp: 0878 - 4513 - 3640</p>
         <hr class="dashed">

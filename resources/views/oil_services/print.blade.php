@@ -50,7 +50,7 @@
 <body onload="window.print();">
     <div class="stiker">
         <div class="header">
-            BENGKEL KARISMA MOTOR<br>
+            BENGKEL ARMOR MOTOR<br>
             <small>GANTI OLI & SERVICE</small>
         </div>
 
@@ -145,7 +145,7 @@
 <body>
   <div class="stiker">
     <div class="header">
-      BENGKEL KARISMA MOTOR
+      BENGKEL ARMOR MOTOR
     </div>
 
     <table>

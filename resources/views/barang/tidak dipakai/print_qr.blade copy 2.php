@@ -107,7 +107,7 @@
                     <small>Harga:
     {{ $barang->harga_jual ? 'Rp ' . number_format($barang->harga_jual, 0, ',', '.') : '-' }}
 </small> <br>
-                    <small>KARISMA MOTOR BANGKALAN</small><br>
+                    <small>ARMOR MOTOR BANGKALAN</small><br>
                 </div>
             </div>
         @endforeach

@@ -166,7 +166,7 @@
             <!-- Footer -->
             <div class="mt-5 text-center border-top pt-3 text-muted small">
                 <p class="mb-0">Terima kasih telah menggunakan layanan kami.</p>
-                <p class="mb-0">Karisma Motor - Sistem Service Kendaraan</p>
+                <p class="mb-0">ARMOR MOTOR - Sistem Service Kendaraan</p>
             </div>
 
             <!-- Tombol Kembali -->

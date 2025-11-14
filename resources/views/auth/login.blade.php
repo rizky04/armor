@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Service</title>
-    <link rel="shortcut icon" href="{{asset('assets/assets/img/1234.jpeg')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{asset('assets/assets/img/1234.png')}}" type="image/x-icon">
     <link rel="stylesheet" href="{{asset('assets/assets/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{asset('assets/assets/plugins/fontawesome/css/all.min.css')}}">
 
@@ -97,7 +97,7 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-logo">
-                <img src="{{asset('assets/assets/img/1234.jpeg')}}" alt="Logo">
+                <img src="{{asset('assets/assets/img/1234.png')}}" alt="Logo">
             </div>
             <h3>Sign In</h3>
             <h4>Please login to your account</h4>

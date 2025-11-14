@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <meta name="description" content="POS - Karisma Motor">
-    <meta name="keywords" content="Karisma Motor">
-    <meta name="author" content="Karisma Motor">
+    <meta name="description" content="POS - ARMOR MOTOR">
+    <meta name="keywords" content="ARMOR MOTOR">
+    <meta name="author" content="ARMOR MOTOR">
     <meta name="robots" content="noindex, nofollow">
 
     <title>Monitoring Service</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/assets/img/1234.jpeg') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/assets/img/1234.png') }}">
 
     <link rel="stylesheet" href="{{ asset('assets/assets/css/bootstrap.min.css') }}">
 

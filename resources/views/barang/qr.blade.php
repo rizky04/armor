@@ -168,7 +168,7 @@
         <div class="detail">Jenis: {{ $barang->jenis ?? '-' }}</div>
         <div class="detail">Keterangan: {{ $barang->keterangan ?? '-' }}</div>
         <div class="harga">Rp {{ $barang->harga_jual ? number_format($barang->harga_jual, 0, ',', '.') : '-' }}</div>
-        <div class="footer">KARISMA MOTOR BANGKALAN</div>
+        <div class="footer">ARMOR MOTOR BANGKALAN</div>
     </div>
 
     <div class="qrbox">
