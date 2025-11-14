@@ -9,7 +9,7 @@
         </div>
         <div class="page-btn d-flex justify-content-between align-items-center gap-2">
             {{-- <button class="btn btn-added mr-1" id="add-client-btn">+ Add Client</button> --}}
-            <button class="btn btn-added" id="btn-add-kendaraan">+ Tambah Data Kendaraan Client</button>
+            {{-- <button class="btn btn-added" id="btn-add-kendaraan">+ Tambah Data Kendaraan Client</button> --}}
         </div>
 
     </div>
