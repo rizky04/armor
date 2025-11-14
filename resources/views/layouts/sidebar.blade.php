@@ -82,11 +82,11 @@
                                  Service</span> <span class="menu-arrow"></span></a>
                          <ul>
                             <li>
-                                <a href="{{ route('services.fastServices') }}" class="{{ request()->routeIs('services.fastServices') ? 'active' : '' }}">Tambah Data Service Cepat</a>
+                                <a href="{{ route('services.fastServices') }}" class="{{ request()->routeIs('services.fastServices') ? 'active' : '' }}">Tambah Data Service</a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="{{ route('services.create') }}" class="{{ request()->routeIs('services.create') ? 'active' : '' }}">Tambah Data Service</a>
-                            </li>
+                            </li> --}}
                             </li>
                                <li>
                                 <a href="{{ route('services.index') }}" class="{{ request()->routeIs('services.index') ? 'active' : '' }}">Data Service</a>
