@@ -9,23 +9,26 @@ use Illuminate\Http\Request;
 
 class BarangImportExportController extends Controller
 {
-    public function export()
+      public function export()
     {
-        return Excel::download(new BarangExport, 'barang.xlsx');
+        return Excel::download(new BarangExport, 'data_barang.xlsx');
     }
 
-  public function import(Request $request)
-{
 
-    $request->validate([
-        'file' => 'required|mimes:xlsx,xls'
-    ]);
+ public function import(Request $request)
+    {
+        // Validasi file harus ada dan formatnya xlsx/xls
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
 
+        try {
+            // Proses import
+            Excel::import(new BarangImport, $request->file('file'));
 
-
-    Excel::import(new BarangImport(), $request->file('file'));
-
-    return back()->with('success', 'Import barang berhasil!');
-}
-
+            return back()->with('success', 'Data Barang berhasil diimport!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }

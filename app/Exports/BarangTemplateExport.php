@@ -14,7 +14,7 @@ class BarangTemplateExport implements WithHeadings
             'merk_barang',
             'keterangan',
             'lokasi',
-            'stok',
+            'stok_barang',
             'pagu',
             'harga_kulak',
             'harga_jual',

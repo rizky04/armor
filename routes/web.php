@@ -289,16 +289,13 @@ Route::get('reportBarangJasa', [ReportController::class, 'reportBarangJasa'])->n
 
 Route::get('/report-combined', [ReportController::class, 'combined']);
 
-// EXPORT
-Route::get('/barang/export/excel', [BarangImportExportController::class, 'export'])->name('barang.export');
 
-// IMPORT
-Route::post('/barang/import/excel', [BarangImportExportController::class, 'import'])->name('barang.import');
-
-Route::get('/barang/template/excel', function () {
+Route::get('template/excel', function () {
     return Excel::download(new \App\Exports\BarangTemplateExport(), 'template_barang.xlsx');
 })->name('barang.template');
 
+Route::get('export', [BarangImportExportController::class, 'export'])->name('barang.export');
+Route::post('import', [BarangImportExportController::class, 'import'])->name('barang.import');
 
 
 });

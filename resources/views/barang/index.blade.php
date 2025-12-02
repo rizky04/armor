@@ -14,21 +14,58 @@
 
 </div>
 
+<div class="card mb-4">
+    <div class="card-body">
+
+                @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Menu Export & Import
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Tombol Export -->
+                    <div class="col-md-6 border-end">
+                        <h5>Export Data</h5>
+                        <p>Unduh data barang ke format Excel.</p>
+                        <a href="{{ route('barang.export') }}" class="btn btn-success">
+                            Download Excel (.xlsx)
+                        </a>
+                    </div>
+
+                    <!-- Form Import -->
+                    <div class="col-md-6">
+                        <h5>Import Data</h5>
+                        <p>Upload file Excel untuk update/tambah data.</p>
+                        <form action="{{ route('barang.import') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="input-group mb-3">
+                                <input type="file" name="file" class="form-control" required>
+                                <button class="btn btn-primary" type="submit">Upload</button>
+                            </div>
+                            <small class="text-muted">*Format header Excel harus sesuai: kode_barang, nama_barang, dll.</small>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
 <div class="card">
-    <a href="{{ route('barang.template') }}" class="btn btn-secondary btn-sm">
-   Download Template Excel
-</a>
-
-<a href="{{ route('barang.export') }}" class="btn btn-warning btn-sm">
-   Export Barang
-</a>
-
-<form action="{{ route('barang.import') }}" method="POST" enctype="multipart/form-data" class="d-inline">
-    @csrf
-    <input type="file" name="file" required>
-    <button class="btn btn-primary btn-sm">Import Barang</button>
-</form>
-
     <div class="card-body">
 
         {{-- Header filter & pencarian --}}
