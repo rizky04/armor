@@ -204,8 +204,7 @@
     </div>
 
     {{-- Jatuh Tempo (Hanya jika hutang) --}}
-    <div class="col-lg-4 col-sm-4 col-12 mt-3" id="due_date_div"
-        style="display: {{ $service->status_bayar == 'hutang' ? 'block' : 'none' }}">
+    <div class="col-lg-4 col-sm-4 col-12 mt-3" id="due_date_div">
         <div class="form-group">
             <label>Jatuh Tempo (jika client hutang)</label>
             <input type="date" name="due_date" class="form-control" value="{{ $service->due_date }}">
@@ -214,8 +213,7 @@
     </div>
 
     {{-- Metode Pembayaran (Hanya jika lunas) --}}
-    <div class="col-lg-4 col-sm-4 col-12 mt-3 payment-field"
-        style="display: {{ $service->status_bayar == 'lunas' ? 'block' : 'none' }}">
+    <div class="col-lg-4 col-sm-4 col-12 mt-3 payment-field">
         <div class="form-group">
             <label>Metode Pembayaran</label>
             <select name="payment_type" id="payment_type" class="form-control">
@@ -229,8 +227,7 @@
     </div>
 
     {{-- Jumlah Bayar --}}
-    <div class="col-lg-6 col-sm-6 col-12 payment-field"
-        style="display: {{ $service->status_bayar == 'lunas' ? 'block' : 'none' }}">
+    <div class="col-lg-6 col-sm-6 col-12 payment-field">
         <div class="form-group">
             <label>Jumlah Bayar</label>
             <input type="text" id="amount_paid_display" class="form-control text-end"
@@ -242,8 +239,7 @@
     </div>
 
     {{-- Kembalian --}}
-    <div class="col-lg-6 col-sm-6 col-12 payment-field"
-        style="display: {{ $service->status_bayar == 'lunas' ? 'block' : 'none' }}">
+    <div class="col-lg-6 col-sm-6 col-12 payment-field">
         <div class="form-group">
             <label>Kembalian</label>
             <input type="text" id="change_display" class="form-control text-end bg-light"
@@ -255,8 +251,7 @@
     </div>
 
     {{-- Catatan --}}
-    <div class="col-lg-12 col-sm-12 col-12 payment-field"
-        style="display: {{ $service->status_bayar == 'lunas' ? 'block' : 'none' }}">
+    <div class="col-lg-12 col-sm-12 col-12 payment-field">
         <div class="form-group">
             <label>Catatan (Opsional)</label>
             <textarea name="note" id="note" class="form-control" rows="2"
