@@ -10,12 +10,25 @@
     @can('master-data-barang-create')
     <button class="btn btn-added" id="btn-add">+ Tambah Barang</button>
     @endcan
-    <button class="btn btn-success" id="btn-print-all">🖨️ Print QR</button>
 </div>
 
 </div>
 
 <div class="card">
+    <a href="{{ route('barang.template') }}" class="btn btn-secondary btn-sm">
+   Download Template Excel
+</a>
+
+<a href="{{ route('barang.export') }}" class="btn btn-warning btn-sm">
+   Export Barang
+</a>
+
+<form action="{{ route('barang.import') }}" method="POST" enctype="multipart/form-data" class="d-inline">
+    @csrf
+    <input type="file" name="file" required>
+    <button class="btn btn-primary btn-sm">Import Barang</button>
+</form>
+
     <div class="card-body">
 
         {{-- Header filter & pencarian --}}

@@ -190,7 +190,7 @@ class Select2Controller extends Controller
 public function barang(Request $request)
 {
     $search = $request->get('q');
-    $query = Barang::query()->where('hapus', '0');
+    $query = Barang::query();
 
     if (!empty($search)) {
         // Pisahkan kata per spasi → contoh: "oli ertiga" jadi ['oli', 'ertiga']
@@ -220,7 +220,7 @@ public function barang(Request $request)
 
 public function barangSemua()
 {
-    $data = Barang::where('hapus', '0')->get();
+    $data = Barang::get();
 
     return response()->json($data);
 }

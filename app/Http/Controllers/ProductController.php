@@ -75,7 +75,6 @@ class ProductController extends Controller
             'harga_jual' => 'required',
             'distributor' => 'required',
             'jenis' => 'required',
-            'hapus' => 'required',
         ]);
 
         Product::create($request->all());

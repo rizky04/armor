@@ -245,7 +245,29 @@
                              Laporan</span> </a>
                 </li>
                  @endcan --}}
+@can('menu-laporan-gabungan')
+                     <li class="submenu">
+                         <a href="javascript:void(0);"><i class="fa-solid fa-book"></i><span>
+                                Penjualan Barang dan Service</span> <span class="menu-arrow"></span></a>
+                         <ul>
 
+
+                             {{-- <li><a href="{{ route('viewReportProduct') }}"
+                                     class="{{ request()->routeIs('viewReportProduct') ? 'active' : '' }}">Report Penjualan Barang</a>
+                             </li>
+
+                                <li><a href="{{ route('viewReportJasa') }}"
+                                        class="{{ request()->routeIs('viewReportJasa') ? 'active' : '' }}">Laporan Jasa</a>
+                                </li> --}}
+
+                                 <li><a href="{{ route('reportBarangJasa') }}"
+                                        class="{{ request()->routeIs('reportBarangJasa') ? 'active' : '' }}">Laporan Barang & Jasa</a>
+                                </li>
+
+
+                         </ul>
+                     </li>
+                 @endcan
              </ul>
          </div>
      </div>

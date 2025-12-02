@@ -8,6 +8,7 @@ use App\Models\SalesItem;
 use App\Models\SalesPayment;
 use App\Models\Service;
 use App\Models\ServicePayment;
+use App\Models\ServiceSparepart;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use Carbon\Carbon;
@@ -564,5 +565,258 @@ public function mekanik(Request $request)
 
     return view('reports.sold-items', compact('sales'));
 }
+
+
+public function viewReportProduct(){
+ return view('reports.reportProduct');
+}
+
+// public function reportProduct(Request $request){
+//      $start = $request->start_date;
+//         $end   = $request->end_date;
+
+//         // ==============================
+//         // 1. Barang terjual dari SERVICE
+//         // ==============================
+//         $service = ServiceSparepart::with(['barang', 'service'])
+//             ->whereHas('service', function ($q) use ($start, $end) {
+//                 if ($start && $end) {
+//                     $q->whereBetween('service_date', [$start, $end]);
+//                 }
+//             })
+//             ->get()
+//             ->map(function ($item) {
+//                 return [
+//                     'tanggal'     => $item->service->service_date,
+//                     'kode_barang' => $item->barang->kode_barang,
+//                     'nama_barang' => $item->barang->nama_barang,
+//                     'qty'         => $item->qty,
+//                     'harga_jual'  => $item->price,
+//                     'harga_beli'  => $item->purchase_price,
+//                     'profit'      => ($item->price - $item->purchase_price) * $item->qty,
+//                     'sumber'      => 'SERVICE'
+//                 ];
+//             });
+
+//         // ==============================
+//         // 2. Barang terjual dari SALES
+//         // ==============================
+//         $sales = SalesItem::with(['barang', 'sales'])
+//             ->whereHas('sales', function ($q) use ($start, $end) {
+//                 if ($start && $end) {
+//                     $q->whereBetween('sales_date', [$start, $end]);
+//                 }
+//             })
+//             ->get()
+//             ->map(function ($item) {
+//                 return [
+//                     'tanggal'     => $item->sales->sales_date,
+//                     'kode_barang' => $item->barang->kode_barang,
+//                     'nama_barang' => $item->barang->nama_barang,
+//                     'qty'         => $item->qty,
+//                     'harga_jual'  => $item->price,
+//                     'harga_beli'  => $item->purchase_price,
+//                     'profit'      => ($item->price - $item->purchase_price) * $item->qty,
+//                     'sumber'      => 'SALES'
+//                 ];
+//             });
+
+//         // Gabungkan data service + sales
+//         $data = $service->merge($sales);
+
+//         // Sort berdasar tanggal
+//         $data = $data->sortBy('tanggal')->values();
+
+//         return response()->json([
+//             'success' => true,
+//             'data' => $data
+//         ]);
+//     }
+
+
+
+// }
+public function reportProduct(Request $request)
+{
+    $start = $request->start_date;
+    $end   = $request->end_date;
+    $search = $request->search;
+
+    // 1. SERVICE
+    $serviceQuery = ServiceSparepart::with(['barang', 'service'])
+        ->whereHas('service', function ($q) use ($start, $end) {
+            if ($start && $end) {
+                $q->whereBetween('service_date', [$start, $end]);
+            }
+        });
+
+    if ($search) {
+        $serviceQuery->whereHas('barang', function ($q) use ($search) {
+            $q->where('nama_barang', 'like', "%$search%")
+              ->orWhere('kode_barang', 'like', "%$search%");
+        });
+    }
+
+    $service = $serviceQuery->get()->map(function ($item) {
+        return [
+            'tanggal'     => $item->service->service_date,
+            'kode_barang' => $item->barang->kode_barang,
+            'nama_barang' => $item->barang->nama_barang,
+            'qty'         => $item->qty,
+            'harga_jual'  => $item->price,
+            'harga_beli'  => $item->purchase_price,
+            'profit'      => ($item->price - $item->purchase_price) * $item->qty,
+            'sumber'      => 'SERVICE'
+        ];
+    });
+
+    // 2. SALES
+    $salesQuery = SalesItem::with(['barang', 'sales'])
+        ->whereHas('sales', function ($q) use ($start, $end) {
+            if ($start && $end) {
+                $q->whereBetween('sales_date', [$start, $end]);
+            }
+        });
+
+    if ($search) {
+        $salesQuery->whereHas('barang', function ($q) use ($search) {
+            $q->where('nama_barang', 'like', "%$search%")
+              ->orWhere('kode_barang', 'like', "%$search%");
+        });
+    }
+
+    $sales = $salesQuery->get()->map(function ($item) {
+        return [
+            'tanggal'     => $item->sales->sales_date,
+            'kode_barang' => $item->barang->kode_barang,
+            'nama_barang' => $item->barang->nama_barang,
+            'qty'         => $item->qty,
+            'harga_jual'  => $item->price,
+            'harga_beli'  => $item->purchase_price,
+            'profit'      => ($item->price - $item->purchase_price) * $item->qty,
+            'sumber'      => 'SALES'
+        ];
+    });
+
+    $data = $service->merge($sales)->sortBy('tanggal')->values();
+
+    return response()->json([
+        'success' => true,
+        'data' => $data
+    ]);
+}
+
+public function viewReportJasa(){
+ return view('reports.reportJasa');
+}
+
+public function reportJasa(Request $request)
+{
+    $start = $request->start_date ?? date('Y-m-01');
+    $end   = $request->end_date ?? date('Y-m-t');
+
+    // Ambil service dalam range tanggal
+    $services = Service::with(['jobs.jasa'])
+        ->betweenDates($start, $end)
+        ->get();
+
+    $search = trim($request->search ?? '');
+
+    $laporan = [];
+
+    foreach ($services as $service) {
+        foreach ($service->jobs as $job) {
+
+            // FILTER DI LEVEL JOB (PENTING)
+            if ($search !== '' && stripos($job->jasa->nama_jasa ?? '', $search) === false) {
+                continue; // skip kalau tidak cocok
+            }
+
+            $id_jasa = $job->id_jasa;
+
+            if (!isset($laporan[$id_jasa])) {
+                $laporan[$id_jasa] = [
+                    'nama_jasa' => $job->jasa->nama_jasa ?? 'Tidak ada nama',
+                    'qty' => 0,
+                    'total_jual' => 0,
+                    'profit' => 0,
+                ];
+            }
+
+            $laporan[$id_jasa]['qty'] += $job->qty;
+            $laporan[$id_jasa]['total_jual'] += $job->price * $job->qty;
+            $laporan[$id_jasa]['profit'] += $job->price * $job->qty;
+        }
+    }
+
+    return response()->json([
+        'data' => array_values($laporan)
+    ]);
+}
+
+public function reportBarangJasa(){
+return view('reports.reportProductJasa');
+}
+
+public function combined(Request $request)
+{
+    $start = $request->start_date;
+    $end   = $request->end_date;
+    $search = $request->search;
+
+    // ==============================
+    // 1. Ambil laporan barang (service + sales)
+    // ==============================
+    $barangRes = $this->reportProduct($request)->getData();
+
+    $barang = collect($barangRes->data);
+
+    $totalBarangQty = $barang->sum('qty');
+    $totalBarangModal = $barang->sum(fn($i) => $i->harga_beli * $i->qty);
+    $totalBarangJual = $barang->sum(fn($i) => $i->harga_jual * $i->qty);
+    $totalBarangProfit = $barang->sum('profit');
+
+    // ==============================
+    // 2. Ambil laporan jasa
+    // ==============================
+    $jasaRes = $this->reportJasa($request)->getData();
+
+    $jasa = collect($jasaRes->data);
+
+    $totalJasaQty = $jasa->sum('qty');
+    $totalJasaOmzet = $jasa->sum('total_jual');
+    $totalJasaProfit = $jasa->sum('profit');
+
+    // ==============================
+    // 3. Hitung total gabungan
+    // ==============================
+    $combinedOmzet = $totalBarangJual + $totalJasaOmzet;
+    $combinedProfit = $totalBarangProfit + $totalJasaProfit;
+
+    return response()->json([
+        'success' => true,
+
+        "barang" => [
+            "data" => $barang,
+            "total_qty" => $totalBarangQty,
+            "total_jual" => $totalBarangJual,
+            "total_modal" => $totalBarangModal,
+            "total_profit" => $totalBarangProfit,
+        ],
+
+        "jasa" => [
+            "data" => $jasa,
+            "total_qty" => $totalJasaQty,
+            "total_omzet" => $totalJasaOmzet,
+            "total_profit" => $totalJasaProfit,
+        ],
+
+        "combined" => [
+            "total_omzet" => $combinedOmzet,
+            "total_profit" => $combinedProfit
+        ]
+    ]);
+}
+
 
 }

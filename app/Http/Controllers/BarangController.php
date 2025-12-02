@@ -228,7 +228,6 @@ public function getData(Request $request)
         ->leftJoinSub($penjualan, 'penjualan', function ($join) {
             $join->on('tbl_barang.id_barang', '=', 'penjualan.id_barang');
         })
-        ->where('hapus', '0')
         ->select(
             'tbl_barang.*',
             DB::raw('COALESCE(penjualan.total_terjual, 0) as total_terjual'),
@@ -298,7 +297,6 @@ public function getData(Request $request)
             ->where('nama_barang', 'like', "%$search%")
             ->orWhere('kode_barang', 'like', "%$search%")
             ->orWhere('merk_barang', 'like', "%$search%")
-            ->orWhere('hapus', '0')
             ->limit(20)
             ->get();
 
@@ -327,7 +325,6 @@ public function getData(Request $request)
             'harga_jual' => 'nullable',
             'distributor' => 'nullable',
             'jenis' => 'nullable',
-            'hapus' => 'nullable',
         ]);
 
         Barang::create($request->all());
@@ -355,7 +352,6 @@ public function getData(Request $request)
             'harga_jual' => 'nullable',
             'distributor' => 'nullable',
             'jenis' => 'nullable',
-            'hapus' => 'nullable',
         ]);
 
         $product = Barang::findOrFail($id);
@@ -366,17 +362,14 @@ public function getData(Request $request)
 
     public function destroy($id)
     {
-        // Barang::findOrFail($id)->delete();
-        // return response()->json(['success' => true, 'message' => 'Product berhasil dihapus']);
-        Barang::where('id_barang', $id)->update(['hapus' => 1]);
-        return response()->json(['success' => true, 'message' => 'Product berhasil dinonaktifkan']);
+        Barang::findOrFail($id)->delete();
+        return response()->json(['success' => true, 'message' => 'Product berhasil dihapus']);
     }
 
     public function nonActive($id)
     {
-        // dd($id);
-        Barang::where('id_barang', $id)->update(['hapus' => 1]);
-        return response()->json(['success' => true, 'message' => 'Product berhasil dinonaktifkan']);
+       Barang::findOrFail($id)->delete();
+        return response()->json(['success' => true, 'message' => 'Product berhasil dihapus']);
     }
 
 
@@ -414,9 +407,7 @@ public function printQr(Request $request)
 public function getByCode($code)
 {
 
-    $barang = Barang::where('id_barang', $code)
-                        ->where('hapus', '0')
-                        ->first();
+    $barang = Barang::where('id_barang', $code)->first();
     if (!$barang) {
         return response()->json(null, 404);
     }
@@ -437,9 +428,7 @@ public function getByCode($code)
 
 public function getByQR($code)
 {
-    $barang = Barang::where('id_barang', $code)
-                    ->where('hapus', '0')
-                    ->first();
+    $barang = Barang::where('id_barang', $code)->first();
     if (!$barang) {
         return response()->json(['message' => 'Barang tidak ditemukan'], 404);
     }

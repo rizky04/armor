@@ -44,7 +44,7 @@ class StokOpnameController extends Controller
 
     public function data(Request $request)
 {
-    $query = Barang::query()->where('hapus', '0'); // Pastikan tidak ambil data yang dihapus
+    $query = Barang::query(); // Pastikan tidak ambil data yang dihapus
 
     // Filter berdasarkan jenis barang (opsional)
     if ($request->filled('jenis')) {

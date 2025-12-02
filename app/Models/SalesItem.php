@@ -32,7 +32,7 @@ class SalesItem extends Model
 
     public function sales()
 {
-    return $this->belongsTo(Sales::class, 'id_sales', 'id');
+    return $this->belongsTo(Sales::class, 'sales_id', 'id');
 }
 
     public function transaksi()

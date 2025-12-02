@@ -20,7 +20,6 @@ class JasaController extends Controller
             $query->where('nama_jasa', 'like', '%' . $request->search . '%');
         }
         $query->where('hapus', '0');
-
         return $query->paginate(10);
     }
 

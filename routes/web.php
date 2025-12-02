@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BarangImportExportController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CustomerController;
@@ -31,6 +32,8 @@ use App\Http\Controllers\StokTransactionController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\OilServiceController;
 use App\Http\Controllers\KasirReportController;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\BarangTemplateExport;
 
 // Redirect root URL to /home if logged in, or to login otherwise
 Route::get('/', function () {
@@ -276,5 +279,26 @@ Route::get('/oil-services/get-oil-names/{service_id}', [OilServiceController::cl
 Route::get('/oil-services/print/{id}', [OilServiceController::class, 'print'])->name('oil_services.print');
 Route::get('/laporan/kasir', [KasirReportController::class, 'getData'])->name('laporan.kasir');
 Route::get('/laporan/kasir/index', [KasirReportController::class, 'index'])->name('laporan.kasir.index');
+
+
+Route::get('reportProduct', [ReportController::class, 'reportProduct'])->name('reportProduct');
+
+Route::get('reportJasa', [ReportController::class, 'reportJasa'])->name('reportJasa');
+
+Route::get('reportBarangJasa', [ReportController::class, 'reportBarangJasa'])->name('reportBarangJasa');
+
+Route::get('/report-combined', [ReportController::class, 'combined']);
+
+// EXPORT
+Route::get('/barang/export/excel', [BarangImportExportController::class, 'export'])->name('barang.export');
+
+// IMPORT
+Route::post('/barang/import/excel', [BarangImportExportController::class, 'import'])->name('barang.import');
+
+Route::get('/barang/template/excel', function () {
+    return Excel::download(new \App\Exports\BarangTemplateExport(), 'template_barang.xlsx');
+})->name('barang.template');
+
+
 
 });

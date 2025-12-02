@@ -100,7 +100,7 @@ class PembelianController extends Controller
 public function barang(Request $request)
 {
     $search = trim(preg_replace('/\s+/', ' ', $request->get('q')));
-    $query = Barang::query()->where('hapus', '0'); // pastikan tidak ambil barang yang dihapus
+    $query = Barang::query(); // pastikan tidak ambil barang yang dihapus
 
     if (!empty($search)) {
         // Pisahkan input jadi beberapa kata (contoh: "oli shell motor")

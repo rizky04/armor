@@ -22,7 +22,6 @@ class Product extends Model
         'harga_jual',
         'distributor',
         'jenis',
-        'hapus',
     ];
 
     public $timestamps = false;
