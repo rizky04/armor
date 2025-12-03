@@ -515,12 +515,7 @@ $('#status_pembayaran').trigger('change');
                         processResults: data => ({
                             results: data.map(item => ({
                                 id: item.id_barang,
-                                text: item.id_barang + ' - ' + item.nama_barang +
-                                    ' - ' + item.kode_barang + ' - ' + item.jenis +
-                                    ' - ' + item.merk_barang + ' - ' + ' stok ' + item
-                                    .stok_barang + ' - ' + item.keterangan + '-' + 'Harga: Rp ' + item
-                                    .harga_jual.toString().replace(
-                                        /\B(?=(\d{3})+(?!\d))/g, "."),
+                                text: item.kode_barang + ' - ' + item.nama_barang,
                                 price: item.harga_jual,
                                 purchase_price: item.harga_kulak
                             }))
