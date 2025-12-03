@@ -24,7 +24,7 @@
             <table id="barangTable" class="table table-bordered table-striped">
                 <thead class="table-secondary">
                     <tr>
-                        <th>Kode</th>
+                        {{-- <th>Kode</th> --}}
                         <th>Nama Barang</th>
                         <th>Jumlah</th>
                         <th>Tipe Transaksi</th>
@@ -99,13 +99,13 @@ $(function() {
     function loadData(page = 1) {
         let search = $('#search').val();
         let tipe = $('#filter_tipe').val();
-
+// <td>${item.barang.kode_barang}</td>
         $.get(`{{ route('stok-transaksi.data') }}`, { search, tipe, page }, function(res) {
             let rows = '';
             $.each(res.data, function(i, item) {
                 rows += `
                     <tr>
-                        <td>${item.barang.kode_barang}</td>
+
                         <td>${item.barang.nama_barang}</td>
                         <td>${item.jumlah}</td>
                         <td>${item.jenis_transaksi}</td>
