@@ -85,7 +85,7 @@
                 <tbody>
                     @foreach($sales->salesItems as $item)
                     <tr data-id="{{ $item->barang->id_barang }}">
-                        <td>{{ $item->barang->id_barang }} -  {{ $item->barang->kode_barang }} - {{ $item->barang->nama_barang }} - {{ $item->barang->merk_barang }} - {{ $item->barang->jenis }} - {{ $item->barang->keterangan }}
+                        <td>{{ $item->barang->kode_barang }} - {{ $item->barang->nama_barang }}
                             <input type="hidden" class="harga-kulak" value="{{ $item->barang->harga_kulak }}">
                         </td>
                         <td><input type="number" class="form-control qty text-center" value="{{ $item->qty }}" style="width:70px;"></td>
@@ -264,7 +264,7 @@ document.addEventListener('click', function enableBeepOnce() {
             processResults: data => ({
                 results: data.map(item => ({
                     id: item.id_barang,
-                    text: `${item.kode_barang} - ${item.nama_barang} (Stok: ${item.stok_barang ?? 0}) - Harga: Rp ${item.harga_jual.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`,
+                    text: `${item.kode_barang} - ${item.nama_barang}`,
                     nama: item.nama_barang,
                     harga: item.harga_jual,
                     harga_kulak: item.harga_kulak,
@@ -326,7 +326,7 @@ document.addEventListener('click', function enableBeepOnce() {
         }
         let tr = `
         <tr data-id="${item.id_barang || item.id}">
-            <td>${item.id || item.id_barang} - ${item.kode || item.kode_barang} - ${item.nama_barang || item.nama} - ${item.merk || item.merk_barang} - ${item.jenis || item.jenis} - ${item.keterangan} <input type="hidden" class="harga-kulak" value="${item.harga_kulak}"></td>
+            <td>${item.kode || item.kode_barang} - ${item.nama_barang || item.nama}<input type="hidden" class="harga-kulak" value="${item.harga_kulak}"></td>
             <td><input type="number" class="form-control qty text-center" value="1" style="width:70px;"></td>
             <td class="harga" data-harga="${item.harga_jual || item.harga}">${formatRupiah(item.harga_jual || item.harga)}</td>
             <td>${item.stock || item.stok}</td>

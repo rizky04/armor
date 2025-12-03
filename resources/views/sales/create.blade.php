@@ -277,7 +277,7 @@ $('#status_bayar').on('change', function() {
             barangData = $.map(data, function (item) {
                 return {
                     id: item.id_barang,
-                    text: `${item.id_barang} - ${item.kode_barang} - ${item.nama_barang} - ${item.merk_barang} - ${item.jenis} - ${item.keterangan} - (Stok: ${item.stok_barang ?? 0}) - Harga: Rp ${item.harga_jual.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`,
+                    text: `${item.kode_barang} - ${item.nama_barang}`,
                     nama: item.nama_barang,
                     kode: item.kode_barang,
                     harga: item.harga_jual,
@@ -450,7 +450,7 @@ $('#status_bayar').on('change', function() {
 
                 let tr = `
             <tr data-id="${item.id}">
-                <td>${item.id} - ${item.kode} - ${item.nama} - ${item.merk} - ${item.jenis} - ${item.keterangan} <input type="hidden" class="harga-kulak" value="${item.harga_kulak}"></td>
+                <td>${item.kode} - ${item.nama}<input type="hidden" class="harga-kulak" value="${item.harga_kulak}"></td>
                 <td>
                     <div class="d-flex justify-content-center">
                         <input type="number" value="1" class="form-control qty text-center" style="width:30%;">
