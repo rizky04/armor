@@ -467,12 +467,7 @@ $('#status_pembayaran').trigger('change');
                         processResults: data => ({
                             results: data.map(item => ({
                                 id: item.id_barang,
-                                text: item.id_barang + ' - ' + item.nama_barang +
-                                    ' - ' + item.kode_barang + ' - ' + item.jenis +
-                                    ' - ' + item.merk_barang + ' - ' + ' stok ' + item
-                                    .stok_barang + ' - ' + item.keterangan + ' - ' + + 'Harga: Rp ' + item
-                                    .harga_jual.toString().replace(
-                                        /\B(?=(\d{3})+(?!\d))/g, "."),
+                                text: item.kode_barang + ' - ' + item.nama_barang ,
                                 price: item.harga_jual,
                                 purchase_price: item.harga_kulak
                             }))
@@ -859,7 +854,7 @@ $('#status_pembayaran').trigger('change');
                     const item = await res.json();
                     addBarangToTable({
                         id: item.id_barang,
-                        nama: `${item.id_barang} - ${item.kode_barang} - ${item.nama_barang} - ${item.jenis} - ${item.keterangan} - (Stok: ${item.stok_barang ?? 0}) - Harga: Rp ${item.harga_jual.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} `,
+                        nama: `${item.kode_barang} - ${item.nama_barang} `,
                         harga: item.harga_jual,
                         harga_kulak: item.harga_kulak,
                         stok: item.stok_barang ?? 0,

@@ -82,18 +82,18 @@
                                  Service</span> <span class="menu-arrow"></span></a>
                          <ul>
                             <li>
-                                <a href="{{ route('services.fastServices') }}" class="{{ request()->routeIs('services.fastServices') ? 'active' : '' }}">Tambah Data Service</a>
+                                <a href="{{ route('services.fastServices') }}" class="{{ request()->routeIs('services.fastServices') ? 'active' : '' }}">Service Cepat</a>
                             </li>
-                            {{-- <li>
-                                <a href="{{ route('services.create') }}" class="{{ request()->routeIs('services.create') ? 'active' : '' }}">Tambah Data Service</a>
-                            </li> --}}
+                            <li>
+                                <a href="{{ route('services.create') }}" class="{{ request()->routeIs('services.create') ? 'active' : '' }}">Service Baru</a>
+                            </li>
                             </li>
                                <li>
                                 <a href="{{ route('services.index') }}" class="{{ request()->routeIs('services.index') ? 'active' : '' }}">Data Service</a>
                             </li>
-                             <li>
+                             {{-- <li>
                                 <a href="{{ route('oil_services.index') }}" class="{{ request()->routeIs('oil_services.index') ? 'active' : '' }}">Kartu Service Oli</a>
-                            </li>
+                            </li> --}}
                          </ul>
                      </li>
                  @endcan

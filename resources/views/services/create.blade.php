@@ -974,7 +974,7 @@ $('#status_pembayaran').trigger('change');
                     processResults: data => ({
                         results: data.map(item => ({
                             id: item.id_barang,
-                            text: `${item.id_barang} - ${item.nama_barang} - stok ${item.stok_barang}`,
+                            text: `${item.kode_barang} - ${item.nama_barang} - stok ${item.stok_barang}`,
                             harga: item.harga_jual,
                             harga_kulak: item.harga_kulak,
                             stok: item.stok_barang,
