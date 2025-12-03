@@ -106,11 +106,11 @@ $(function() {
                 console.log(item);
                 rows += `
                     <tr>
-                        <td>${item.barang.kode_barang}</td>
-                        <td>${item.barang.nama_barang}</td>
-                        <td>${item.jumlah}</td>
-                        <td>${item.jenis_transaksi}</td>
-                        <td>${item.created_at}</td>
+                        <td>${item.barang.kode_barang ?? ''}</td>
+                        <td>${item.barang.nama_barang ?? ''}</td>
+                        <td>${item.jumlah ?? ''}</td>
+                        <td>${item.jenis_transaksi ?? ''}</td>
+                        <td>${item.created_at ?? ''}</td>
                         <td>
                             <button class="btn btn-danger btn-sm btn-delete" data-id="${item.id}">
                                 <i class="bi bi-trash"></i>

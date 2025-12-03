@@ -150,17 +150,17 @@
                     rows += `
         <tr>
           <td>${++i}</td>
-          <td>${p.barang.id_barang}</td>
-            <td>${p.barang.kode_barang}</td>
-          <td>${p.barang.nama_barang}</td>
-            <td>${p.barang.merk_barang}</td>
-            <td>${p.barang.keterangan}</td>
-            <td>${p.barang.jenis}</td>
-          <td>${p.harga_kulak}</td>
-          <td>${p.harga_jual}</td>
-          <td>${p.jumlah_pembelian}</td>
-          <td>${stok_akhir - p.jumlah_pembelian}</td>
-          <td>${stok_akhir}</td>
+          <td>${p.barang.id_barang ?? ''}</td>
+            <td>${p.barang.kode_barang ?? ''}</td>
+          <td>${p.barang.nama_barang ?? ''}</td>
+            <td>${p.barang.merk_barang ?? ''}</td>
+            <td>${p.barang.keterangan  ?? ''}</td>
+            <td>${p.barang.jenis ?? ''}</td>
+          <td>${p.harga_kulak  ?? ''}</td>
+          <td>${p.harga_jual  ?? ''}</td>
+          <td>${p.jumlah_pembelian  ?? ''}</td>
+          <td>${stok_akhir - (p.jumlah_pembelian ?? 0)}</td>
+          <td>${stok_akhir  ?? ''}</td>
           <td>
             ${btnEdit}
             ${btnDelete}
