@@ -4,127 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Penjualan #{{ $sales->nomor_sales }}</title>
-    <style>
+
+   <style>
     @media print {
-        @page { size: 80mm auto; margin: 0; }
-        body { margin: 0; font-family: 'Courier New', monospace; font-size: 11px; }
-        .no-print { display: none; }
+        @page {
+            size: 241mm auto; /* ukuran continuous form dot matrix */
+            margin: 0;
+        }
     }
 
     body {
-        background: #fff;
+        width: 235mm; /* <── dikurangi dari 241mm supaya ada jarak kiri kanan */
+        margin: 0 auto;  /* center otomatis */
+        padding: 5mm 8mm; /* <── ruang kanan kiri */
         font-family: 'Courier New', monospace;
-        font-size: 11px;
-        line-height: 1.4;
-        font-weight: bold; /* Semua teks bold */
+        font-size: 12px;
+        line-height: 1.25;
     }
 
-    .invoice-wrapper {
-        width: 80mm;
-        margin: 10px auto;
-        padding: 10px;
-        border: 1px solid #eee;
-        background: #fff;
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .bold { font-weight: bold; }
+
+    .line {
+        border-top: 1px dashed #000;
+        margin: 6px 0;
     }
 
-    .text-center { text-align: center; }
-    .text-right { text-align: right; }
-    .dotted { border-bottom: 1px dotted #000; margin: 5px 0; }
-    hr.dashed { border: none; border-top: 1px dashed #000; margin: 5px 0; }
-
-    .table { width: 100%; border-collapse: collapse; }
-    .table th, .table td { padding: 4px 0; }
-
-    /* Tambahan untuk memperjelas item */
-    .item-row td {
-        border-bottom: 1px dotted #000;
-        padding: 4px 0;
+    table {
+        width: 100%;
+        border-collapse: collapse;
     }
-    .item-name {
-        text-transform: uppercase;
+
+    table td {
+        padding: 3px 2px;
+        vertical-align: top;
     }
-    </style>
+</style>
+
 </head>
 <body>
-<div class="invoice-wrapper">
 
     <!-- HEADER -->
-    <div class="text-center">
-        <h5 class="mb-1">ARMOR MOTOR</h5>
-        <p class="mb-1">Jl. Raya Nyorondung No. 96, Pamorah, Bangkalan</p>
-        <p class="mb-1">Telp: 0878 - 4513 - 3640</p>
-        <hr class="dashed">
-        <p>INVOICE PENJUALAN</p>
-        <p>No: {{ $sales->nomor_sales }}</p>
-        <p>Tanggal: {{ \Carbon\Carbon::parse($sales->sales_date)->format('d/m/Y') }}</p>
-        <hr class="dashed">
-    </div>
+    <div class="center bold" style="font-size: 15px;">ARMOR MOTOR</div>
+    <div class="center">Jl. Raya Nyorondung No. 96, Pamorah</div>
+    <div class="center">Bangkalan | Telp: 0878-4513-3640</div>
 
-    <!-- CUSTOMER INFO -->
-    <div>
-        <p class="mb-1">Nama: {{ $sales->client->nama_client ?? '-' }}</p>
-        <p class="mb-1">Telp: {{ $sales->client->no_telp ?? '-' }}</p>
-        <p class="mb-1">Status Bayar: {{ $sales->total_paid >= $sales->total ? 'LUNAS' : 'BELUM LUNAS' }}</p>
-        <hr class="dotted">
-    </div>
+    <div class="line"></div>
 
-    <!-- BARANG -->
-    <p class="mb-1">BARANG / PRODUK:</p>
-    <table class="table">
-        <thead>
+    <div class="bold center">INVOICE</div>
+
+    <table>
+        <tr>
+            <td>No Invoice</td><td>:</td><td>{{ $sales->nomor_sales }}</td>
+            <td class="right">Tanggal : {{ \Carbon\Carbon::parse($sales->sales_date)->format('d/m/Y') }}</td>
+        </tr>
+    </table>
+
+    <div class="line"></div>
+
+    <table>
+        <tr><td>Nama</td><td>:</td><td>{{ $sales->client->nama_client ?? '-' }}</td></tr>
+        <tr><td>Telp</td><td>:</td><td>{{ $sales->client->no_telp ?? '-' }}</td></tr>
+        <tr>
+            <td>Status</td>
+            <td>:</td>
+            <td>{{ $sales->total_paid >= $sales->total ? 'LUNAS' : 'BELUM LUNAS' }}</td>
+        </tr>
+    </table>
+
+    <div class="line"></div>
+
+    <table>
+        <tr>
+            <td class="bold">Nama Barang</td>
+            <td class="bold center">Qty</td>
+            <td class="bold right">Subtotal</td>
+        </tr>
+
+        @php $grandTotal = 0; @endphp
+        @foreach($sales->items as $item)
+            @php $grandTotal += $item->subtotal; @endphp
             <tr>
-                <th>NAMA</th>
-                 <th>QTY</th>
-                <th class="text-right">SUBTOTAL</th>
+                <td>{{ $item->barang->nama_barang ?? '' }} {{ $item->barang->merk_barang ?? '' }}</td>
+                <td class="center">{{ $item->qty }}</td>
+                <td class="right">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @php $grandTotal = 0; @endphp
-            @forelse($sales->items as $item)
-                @php $grandTotal += $item->subtotal; @endphp
-                <tr class="item-row">
-                    <td class="item-name">{{ $item->barang->nama_barang ?? '-' }} {{ $item->barang->merk_barang ?? '-' }} {{ $item->barang->jenis ?? '-' }} {{ $item->barang->keterangan ?? '-' }}</td>
-                    <td class="item-name">{{ $item->qty }}</td>
-                    <td class="text-right">{{ number_format($item->subtotal, 0, ',', '.') }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="2">-</td></tr>
-            @endforelse
-        </tbody>
+        @endforeach
     </table>
 
-    <!-- TOTAL -->
-    <hr class="dashed">
-    <table class="table">
+    <div class="line"></div>
+
+    <table>
+        <tr><td>Total</td><td class="right bold">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td></tr>
+        <tr><td>Dibayar</td><td class="right bold">Rp {{ number_format($sales->total_paid, 0, ',', '.') }}</td></tr>
+        <tr><td>Sisa</td><td class="right bold">Rp {{ number_format($sales->due_amount, 0, ',', '.') }}</td></tr>
         <tr>
-            <td>TOTAL</td>
-            <td class="text-right">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td>DIBAYAR</td>
-            <td class="text-right">Rp {{ number_format($sales->total_paid, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td>SISA</td>
-            <td class="text-right">Rp {{ number_format($sales->due_amount, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td>KEMBALI</td>
-            <td class="text-right">Rp {{ number_format($sales->payments->last()->change_amount, 0, ',', '.') }}</td>
+            <td>Kembali</td>
+            <td class="right bold">Rp {{ number_format($sales->payments->last()->change_amount ?? 0, 0, ',', '.') }}</td>
         </tr>
     </table>
 
-    <hr class="dotted">
-    <p class="text-center">TERIMA KASIH ATAS KEPERCAYAAN ANDA!</p>
-</div>
+    <div class="line"></div>
+
+    <div class="center bold" style="margin-top: 5px;">
+        Terima kasih atas kepercayaan Anda!
+    </div>
+
 </body>
+
 <script>
-    window.onload = () => {
-        window.print();
-    };
-    window.onafterprint = () => {
-        window.close();
-    };
+    window.onload = () => window.print();
 </script>
 
 </html>

@@ -267,6 +267,8 @@
         });
 
         $(document).ready(function() {
+            let isManualAmount = false;
+
 
 
            // ==================== TAMPILKAN JATUH TEMPO SAAT HUTANG ====================
@@ -311,21 +313,38 @@ $('#status_pembayaran').trigger('change');
             }
 
             // === Update otomatis Amount Paid & Kembalian ===
+            // function updatePaymentFields(forceUpdate = false) {
+            //     const grandTotal = parseRupiah($('#grand-total').val());
+            //     let amountPaid = parseRupiah($('#amount_paid_display').val());
+
+            //     // Jika amount_paid kosong ATAU mode auto-update aktif (forceUpdate = true)
+            //     if (!amountPaid || forceUpdate) {
+            //         amountPaid = grandTotal;
+            //         $('#amount_paid_display').val(formatRupiah(amountPaid));
+            //     }
+
+            //     const change = amountPaid - grandTotal;
+            //     $('#change_display').val(formatRupiah(change > 0 ? change : 0));
+            //     $('#amount_paid').val(amountPaid);
+            //     $('#change').val(change > 0 ? change : 0);
+            // }
             function updatePaymentFields(forceUpdate = false) {
-                const grandTotal = parseRupiah($('#grand-total').val());
-                let amountPaid = parseRupiah($('#amount_paid_display').val());
+    const grandTotal = parseRupiah($('#grand-total').val());
+    let amountPaid = parseRupiah($('#amount_paid_display').val());
 
-                // Jika amount_paid kosong ATAU mode auto-update aktif (forceUpdate = true)
-                if (!amountPaid || forceUpdate) {
-                    amountPaid = grandTotal;
-                    $('#amount_paid_display').val(formatRupiah(amountPaid));
-                }
+    // Jika belum pernah diganti manual atau sedang di-trigger otomatis by system
+    if (!isManualAmount || forceUpdate) {
+        amountPaid = grandTotal;
+        $('#amount_paid_display').val(formatRupiah(amountPaid));
+    }
 
-                const change = amountPaid - grandTotal;
-                $('#change_display').val(formatRupiah(change > 0 ? change : 0));
-                $('#amount_paid').val(amountPaid);
-                $('#change').val(change > 0 ? change : 0);
-            }
+    const change = amountPaid - grandTotal;
+
+    $('#change_display').val(formatRupiah(change > 0 ? change : 0));
+    $('#amount_paid').val(amountPaid);
+    $('#change').val(change > 0 ? change : 0);
+}
+
 
 
 
@@ -363,6 +382,7 @@ $('#status_pembayaran').trigger('change');
 
             // === Saat jumlah bayar diubah manual ===
             $(document).on('input', '#amount_paid_display', function() {
+                isManualAmount = true; // user sedang input manual
                 updatePaymentFields();
             });
 
@@ -478,6 +498,7 @@ $('#status_pembayaran').trigger('change');
                                             row.find('.job-price-hidden').val(res.data
                                                 .harga_jasa);
                                             row.find('.job-qty').val(1);
+                                            isManualAmount = false;
                                             calculateGrandTotal();
 
                                             Swal.fire('Berhasil', 'Jasa baru ditambahkan',
@@ -495,6 +516,7 @@ $('#status_pembayaran').trigger('change');
                             .data('raw', data.price);
                         row.find('.job-price-hidden').val(data.price);
                         row.find('.job-qty').val(1);
+                        isManualAmount = false;
                         calculateGrandTotal();
                     }
                 }
@@ -528,6 +550,7 @@ $('#status_pembayaran').trigger('change');
                     row.find('.price-hidden').val(data.price);
                     row.find('.purchase-price-hidden').val(data.purchase_price);
                     row.find('.qty').val(1);
+                    isManualAmount = false;
                     calculateGrandTotal();
                 });
             }
@@ -576,112 +599,11 @@ $('#status_pembayaran').trigger('change');
             $(document).on('input', '.qty, .job-qty', calculateGrandTotal);
             $(document).on('click', '.remove-row', function() {
                 $(this).closest('tr').remove();
+                isManualAmount = false;
                 calculateGrandTotal();
             });
 
-            // // ============ Select2 Kendaraan ============
-            // $('#vehicle_id').select2({
-            //     placeholder: 'Pilih kendaraan',
-            //     ajax: {
-            //         url: "{{ route('select2.vehicles') }}",
-            //         dataType: 'json',
-            //         delay: 250,
-            //         data: params => ({
-            //             q: params.term
-            //         }),
-            //         processResults: data => ({
-            //             results: data.map(item => ({
-            //                 id: item.id,
-            //                 text: item.license_plate + ' - ' + item.client.nama_client,
-            //                 id_client: item.id_client
-            //             }))
-            //         })
-            //     }
-            // });
 
-            // // ================== Saat kendaraan dipilih ==================
-            // $('#vehicle_id').on('select2:select', function(e) {
-            //     let data = e.params.data;
-            //     $('#id_client').val(data.id_client); // isi otomatis id_client
-            // });
-
-
-            //   // ============ Modal Kendaraan ============
-
-            // function initSelect2Client() {
-            //     $('#client_select').select2({
-            //         dropdownParent: $('#vehicleModal'),
-            //         placeholder: 'Pilih Client...',
-            //         allowClear: true,
-            //         ajax: {
-            //             url: "{{ route('select2.clients') }}",
-            //             dataType: 'json',
-            //             delay: 250,
-            //             data: params => ({
-            //                 q: params.term
-            //             }),
-            //             processResults: data => ({
-            //                 results: data.map(item => ({
-            //                     id: item.id_client,
-            //                     text: `${item.nama_client} - ${item.no_telp ?? ''} - ${item.alamat ?? ''}`
-            //                 }))
-            //             })
-            //         },
-            //         minimumInputLength: 1,
-            //         width: '100%'
-            //     });
-            // }
-
-            // // tambah
-            // $('#btn-add-kendaraan').on('click', function() {
-            //     initSelect2Client()
-            //     $('#vehicleForm')[0].reset();
-            //     $('#vehicle_id').val('');
-            //     $('#id_client').val(null).trigger('change'); // reset select2
-            //     $('#photo-preview').attr('src', '').hide(); // reset foto preview
-            //     $('#vehicleModal .modal-title').text('Add Vehicle');
-            //     $('#vehicleModal').modal('show');
-            // });
-            // // simpan
-            // $('#vehicleForm').on('submit', function(e) {
-            //     e.preventDefault();
-            //     let id = $('#vehicle_id').val();
-            //     console.log('Vehicle ID:', id); // Debug: cek nilai id
-            //     let url = id ? `/vehicles/${id}` : "{{ route('vehicles.store') }}";
-
-            //     let formData = new FormData(this);
-            //     if (id) formData.append('_method', 'PUT');
-            //     formData.append('_token', "{{ csrf_token() }}");
-
-            //     $.ajax({
-            //         url: url,
-            //         method: 'POST',
-            //         data: formData,
-            //         processData: false,
-            //         contentType: false,
-            //         success: function(res) {
-            //             $('#vehicleModal').modal('hide');
-            //             // loadVehicles(currentPage, searchQuery);
-            //             Swal.fire('Success', res.message, 'success');
-            //         },
-            //         error: function(xhr) {
-            //             if (xhr.responseJSON && xhr.responseJSON.errors) {
-            //                 let errors = xhr.responseJSON.errors;
-            //                 let msg = Object.values(errors).map(e => e[0]).join('<br>');
-            //                 Swal.fire('Error', msg, 'error');
-            //             } else {
-            //                 Swal.fire('Error', 'Terjadi kesalahan saat simpan data', 'error');
-            //             }
-            //         }
-            //     });
-            // });
-            // // preview foto di modal ketika klik thumbnail
-            // $(document).on('click', '.preview-photo', function() {
-            //     let src = $(this).data('src');
-            //     $('#modal-photo').attr('src', src);
-            //     $('#photoModal').modal('show');
-            // });
-            // // ============ Modal Kendaraan ============
 
             function initVehicleSelect() {
                 $('#vehicle_id').select2({
@@ -1047,7 +969,7 @@ $('#status_pembayaran').trigger('change');
                     // Efek highlight hijau sebentar
                     existingRow.addClass('table-success');
                     setTimeout(() => existingRow.removeClass('table-success'), 700);
-
+                    isManualAmount = false;
                     calculateGrandTotal();
                     return;
                 }
@@ -1089,6 +1011,7 @@ $('#status_pembayaran').trigger('change');
                     scrollTop: $('#spareparts-table tbody tr:last').offset().top
                 }, 300);
 
+                isManualAmount = false;
                 calculateGrandTotal();
             }
 

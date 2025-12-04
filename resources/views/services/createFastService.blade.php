@@ -219,6 +219,7 @@
 
 
         $(document).ready(function() {
+            let isManualAmount = false;
 
             initVehicleSelect();
 
@@ -263,21 +264,39 @@ $('#status_pembayaran').trigger('change');
             }
 
             // === Update otomatis Amount Paid & Kembalian ===
+            // function updatePaymentFields(forceUpdate = false) {
+            //     const grandTotal = parseRupiah($('#grand-total').val());
+            //     let amountPaid = parseRupiah($('#amount_paid_display').val());
+
+            //     // Jika amount_paid kosong ATAU mode auto-update aktif (forceUpdate = true)
+            //     if (!amountPaid || forceUpdate) {
+            //         amountPaid = grandTotal;
+            //         $('#amount_paid_display').val(formatRupiah(amountPaid));
+            //     }
+
+            //     const change = amountPaid - grandTotal;
+            //     $('#change_display').val(formatRupiah(change > 0 ? change : 0));
+            //     $('#amount_paid').val(amountPaid);
+            //     $('#change').val(change > 0 ? change : 0);
+            // }
             function updatePaymentFields(forceUpdate = false) {
-                const grandTotal = parseRupiah($('#grand-total').val());
-                let amountPaid = parseRupiah($('#amount_paid_display').val());
+    const grandTotal = parseRupiah($('#grand-total').val());
+    let amountPaid = parseRupiah($('#amount_paid_display').val());
 
-                // Jika amount_paid kosong ATAU mode auto-update aktif (forceUpdate = true)
-                if (!amountPaid || forceUpdate) {
-                    amountPaid = grandTotal;
-                    $('#amount_paid_display').val(formatRupiah(amountPaid));
-                }
+    // Jika belum manual atau paksa update otomatis
+    if (!isManualAmount || forceUpdate) {
+        amountPaid = grandTotal;
+        $('#amount_paid_display').val(formatRupiah(amountPaid));
+    }
 
-                const change = amountPaid - grandTotal;
-                $('#change_display').val(formatRupiah(change > 0 ? change : 0));
-                $('#amount_paid').val(amountPaid);
-                $('#change').val(change > 0 ? change : 0);
-            }
+    const change = amountPaid - grandTotal;
+    const changeVal = change > 0 ? change : 0;
+
+    $('#change_display').val(formatRupiah(changeVal));
+    $('#amount_paid').val(amountPaid);
+    $('#change').val(changeVal);
+}
+
 
 
 
@@ -315,7 +334,8 @@ $('#status_pembayaran').trigger('change');
 
             // === Saat jumlah bayar diubah manual ===
             $(document).on('input', '#amount_paid_display', function() {
-                updatePaymentFields();
+                isManualAmount = true;
+    updatePaymentFields(false);
             });
 
             // mekanik
@@ -430,6 +450,7 @@ $('#status_pembayaran').trigger('change');
                                             row.find('.job-price-hidden').val(res.data
                                                 .harga_jasa);
                                             row.find('.job-qty').val(1);
+                                            isManualAmount = false;
                                             calculateGrandTotal();
 
                                             Swal.fire('Berhasil', 'Jasa baru ditambahkan',
@@ -447,6 +468,7 @@ $('#status_pembayaran').trigger('change');
                             .data('raw', data.price);
                         row.find('.job-price-hidden').val(data.price);
                         row.find('.job-qty').val(1);
+                        isManualAmount = false;
                         calculateGrandTotal();
                     }
                 }
@@ -480,6 +502,7 @@ $('#status_pembayaran').trigger('change');
                     row.find('.price-hidden').val(data.price);
                     row.find('.purchase-price-hidden').val(data.purchase_price);
                     row.find('.qty').val(1);
+                    isManualAmount = false;
                     calculateGrandTotal();
                 });
             }
@@ -528,6 +551,7 @@ $('#status_pembayaran').trigger('change');
             $(document).on('input', '.qty, .job-qty', calculateGrandTotal);
             $(document).on('click', '.remove-row', function() {
                 $(this).closest('tr').remove();
+                isManualAmount = false;
                 calculateGrandTotal();
             });
 
@@ -896,7 +920,7 @@ $('#status_pembayaran').trigger('change');
                     // Efek highlight hijau sebentar
                     existingRow.addClass('table-success');
                     setTimeout(() => existingRow.removeClass('table-success'), 700);
-
+isManualAmount = false;
                     calculateGrandTotal();
                     return;
                 }
@@ -938,6 +962,7 @@ $('#status_pembayaran').trigger('change');
                     scrollTop: $('#spareparts-table tbody tr:last').offset().top
                 }, 300);
 
+                isManualAmount = false;
                 calculateGrandTotal();
             }
 

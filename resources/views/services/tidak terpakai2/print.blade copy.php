@@ -17,7 +17,6 @@
             margin: 0;
             font-family: 'Courier New', monospace;
             font-size: 11px;
-            font-weight: bold;
         }
         .no-print {
             display: none;
@@ -29,24 +28,24 @@
         font-family: 'Courier New', monospace;
         font-size: 11px;
         line-height: 1.3;
-        font-weight: bold;
     }
 
     .invoice-wrapper {
         width: 80mm;
         margin: 10px auto;
         padding: 10px;
-        border: 1px solid #000;
+        border: 1px solid #eee;
         background: #fff;
     }
 
     .text-center { text-align: center; }
     .text-right { text-align: right; }
+    .bold { font-weight: bold; }
     .dotted { border-bottom: 1px dotted #000; margin: 5px 0; }
     hr.dashed { border: none; border-top: 1px dashed #000; margin: 5px 0; }
     .total-line { border-top: 1px solid #000; margin-top: 5px; padding-top: 5px; }
     .table { width: 100%; border-collapse: collapse; }
-    .table th, .table td { padding: 3px 0; font-weight: bold; }
+    .table th, .table td { padding: 3px 0; }
     .mt-2 { margin-top: 6px; }
     .mb-1 { margin-bottom: 4px; }
     </style>
@@ -57,11 +56,11 @@
 
     <!-- HEADER -->
     <div class="text-center">
-        <h5>ARMOR MOTOR</h5>
-        <p>Jl. Raya Nyorondung No. 96, Pamorah, Bangkalan</p>
-        <p>Telp: 0878 - 4513 - 3640</p>
+        <h5 class="bold mb-1">ARMOR MOTOR</h5>
+        <p class="mb-1">Jl. Raya Nyorondung No. 96, Pamorah, Bangkalan</p>
+        <p class="mb-1">Telp: 0878 - 4513 - 3640</p>
         <hr class="dashed">
-        <p>INVOICE SERVICE</p>
+        <p><strong>INVOICE SERVICE</strong></p>
         <p>No: {{ $service->nomor_service }}</p>
         <p>Tanggal: {{ \Carbon\Carbon::parse($service->service_date)->format('d/m/Y H:i') }}</p>
         <hr class="dashed">
@@ -69,21 +68,20 @@
 
     <!-- CUSTOMER & VEHICLE INFO -->
     <div>
-        <p>Nama: {{ $service->vehicle->client->nama_client ?? '-' }}</p>
-        <p>Telp: {{ $service->vehicle->client->no_telp ?? '-' }}</p>
-        <p>Plat: {{ $service->vehicle->license_plate ?? '-' }}</p>
-        <p>Status: {{ ucfirst($service->status ?? '-') }}</p>
-        <p>Status bayar: {{ $service->status_bayar ?? '-' }}</p>
+        <p class="mb-1"><strong>Nama:</strong> {{ $service->vehicle->client->nama_client ?? '-' }}</p>
+        <p class="mb-1"><strong>Telp:</strong> {{ $service->vehicle->client->no_telp ?? '-' }}</p>
+        <p class="mb-1"><strong>Plat:</strong> {{ $service->vehicle->license_plate ?? '-' }}</p>
+        <p class="mb-1"><strong>Status:</strong> {{ ucfirst($service->status ?? '-') }}</p>
+        <p class="mb-1"><strong>Status bayar:</strong> {{ $service->status_bayar ?? '-'}}</p>
         <hr class="dotted">
     </div>
 
     <!-- PEKERJAAN -->
-    <p>Pekerjaan:</p>
+    <p class="bold mb-1">Pekerjaan:</p>
     <table class="table">
         <thead>
             <tr>
                 <th>Jasa</th>
-                <th>qty</th>
                 <th class="text-right">Subtotal</th>
             </tr>
         </thead>
@@ -93,22 +91,20 @@
                 @php $totalJasa += $job->subtotal; @endphp
                 <tr>
                     <td>{{ $job->jasa->nama_jasa ?? '-' }}</td>
-                    <td>{{ $job->qty ?? '-' }}</td>
                     <td class="text-right">{{ number_format($job->subtotal, 0, ',', '.') }}</td>
                 </tr>
             @empty
-                <tr><td colspan="2" class="text-center">-</td></tr>
+                <tr><td colspan="2">-</td></tr>
             @endforelse
         </tbody>
     </table>
 
     <!-- SPAREPART -->
-    <p class="mt-2">Sparepart:</p>
+    <p class="bold mb-1 mt-2">Sparepart:</p>
     <table class="table">
         <thead>
             <tr>
                 <th>Barang</th>
-                <th>qty</th>
                 <th class="text-right">Subtotal</th>
             </tr>
         </thead>
@@ -117,12 +113,11 @@
             @forelse($service->spareparts as $sp)
                 @php $totalSparepart += $sp->subtotal; @endphp
                 <tr>
-                    <td>{{ $sp->barang->nama_barang ?? '-' }} {{ $sp->barang->merk_barang ?? '-' }} {{ $sp->barang->jenis ?? '-' }} {{ $sp->barang->keterangan ?? '-' }}</td>
-                     <td>{{ $sp->qty }}</td>
+                    <td>{{ $sp->barang->nama_barang ?? '-' }}</td>
                     <td class="text-right">{{ number_format($sp->subtotal, 0, ',', '.') }}</td>
                 </tr>
             @empty
-                <tr><td colspan="2" class="text-center">-</td></tr>
+                <tr><td colspan="2">-</td></tr>
             @endforelse
         </tbody>
     </table>
@@ -132,35 +127,31 @@
     <hr class="dashed">
     <table class="table">
         <tr>
-            <td>Total Jasa</td>
+            <td><strong>Total Jasa</strong></td>
             <td class="text-right">Rp {{ number_format($totalJasa, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td>Total Sparepart</td>
+            <td><strong>Total Sparepart</strong></td>
             <td class="text-right">Rp {{ number_format($totalSparepart, 0, ',', '.') }}</td>
         </tr>
         <tr class="total-line">
-            <td>Grand Total</td>
-            <td class="text-right">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td>
+            <td><strong>Grand Total</strong></td>
+            <td class="text-right"><strong>Rp {{ number_format($grandTotal, 0, ',', '.') }}</strong></td>
         </tr>
         <tr>
-            <td>Dibayar</td>
+            <td><strong>Dibayar</strong></td>
             <td class="text-right">Rp {{ number_format($service->total_paid, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td>Sisa bayar</td>
+            <td><strong>Sisa</strong></td>
             <td class="text-right">Rp {{ number_format($service->due_amount, 0, ',', '.') }}</td>
         </tr>
-        <tr>
-            <td>Kembali</td>
-            <td class="text-right">Rp {{ number_format($service->payments->last()->change_amount, 0, ',', '.') }}</td>
-        </tr>
-    </table>
 
+    </table>
     <hr class="dashed">
 
     <!-- MEKANIK -->
-    <p>Mekanik:</p>
+    <p class="bold mb-1">Mekanik:</p>
     <ul style="margin:0; padding-left:15px;">
         @forelse($service->mechanics as $m)
             <li>{{ $m->name }}</li>
@@ -173,13 +164,12 @@
     <p class="text-center">Terima kasih atas kepercayaan Anda!</p>
 </div>
 
+<!-- Tombol Cetak -->
+{{-- <div class="text-center mt-2 no-print">
+    <button onclick="window.print()" style="padding:6px 12px;background:#007bff;color:#fff;border:none;border-radius:4px;">
+        🖨 Cetak Invoice
+    </button>
+</div> --}}
+
 </body>
-<script>
-    window.onload = () => {
-        window.print();
-    };
-    window.onafterprint = () => {
-        window.close();
-    };
-</script>
 </html>
