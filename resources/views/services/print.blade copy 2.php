@@ -7,23 +7,23 @@
 <style>
     @media print {
         @page {
-            size: A5;
+            size: A4;
             margin: 5mm;
         }
     }
 
     body {
         font-family: "Courier New", Courier, monospace;
-        font-size: 14px; /* FONT LEBIH BESAR */
+        font-size: 12px; /* ukuran khas dotmatrix */
         line-height: 1.3;
-        text-align: center; /* KETENGAHKAN SEMUA */
+        font-weight: normal;
     }
 
     .wrapper {
-        width: 180mm; /* DIPERKECIL AGAR TIDAK MELEBAR */
-        margin: 0 auto; /* BIAR TENGAH */
-        padding: 5px 10px;
-        text-align: left;
+        width: 235mm; /* ukuran fanfold dotmatrix */
+        margin: auto;
+        padding: 5px;
+        border: none;
     }
 
     .text-center { text-align: center; }
@@ -31,7 +31,7 @@
 
     .divider {
         border-bottom: 1px dashed #000;
-        margin: 4px 0;
+        margin: 2px 0;
     }
 
     table { width: 100%; }
@@ -48,10 +48,10 @@
 <div class="wrapper">
 
     <div class="text-center">
-        <strong style="font-size:16px;">ARMOR MOTOR</strong><br>
+        <strong>ARMOR MOTOR</strong><br>
         Jl. Raya Bancaran<br>
         -------------------------------------------<br>
-        <strong style="font-size:16px;">INVOICE SERVICE</strong><br>
+        <strong>INVOICE SERVICE</strong><br>
         No: {{ $service->nomor_service }}<br>
         Tgl: {{ \Carbon\Carbon::parse($service->service_date)->format('d/m/Y H:i') }}<br>
         -------------------------------------------
@@ -68,9 +68,7 @@
     <strong>Pekerjaan</strong><br>
     <table>
         <tr><td>Jasa</td><td>Qty</td><td class="text-right">Subtotal</td></tr>
-
         @php $totalJasa = 0; @endphp
-
         @foreach($service->jobs ?? [] as $job)
             @php $totalJasa += $job->subtotal; @endphp
             <tr>
@@ -86,9 +84,7 @@
     <strong>Sparepart</strong><br>
     <table>
         <tr><td>Barang</td><td>Qty</td><td class="text-right">Subtotal</td></tr>
-
         @php $totalSparepart = 0; @endphp
-
         @foreach($service->spareparts ?? [] as $sp)
             @php $totalSparepart += $sp->subtotal; @endphp
             <tr>
@@ -111,7 +107,9 @@
         </tr>
         <tr><td>Dibayar</td><td class="text-right">{{ number_format($service->total_paid, 0, ',', '.') }}</td></tr>
         <tr><td>Sisa Bayar</td><td class="text-right">{{ number_format($service->due_amount, 0, ',', '.') }}</td></tr>
-        <tr><td>Kembali</td><td class="text-right">{{ number_format($service->payments->last()->change_amount ?? 0, 0, ',', '.') }}</td></tr>
+        <tr><td>Kembali</td><td class="text-right">
+            {{ number_format($service->payments->last()->change_amount ?? 0, 0, ',', '.') }}
+        </td></tr>
     </table>
 
     <div class="divider"></div>
@@ -125,7 +123,7 @@
 
     <div class="divider"></div>
 
-    <div class="text-center" style="font-size:16px;">
+    <div class="text-center">
         *** TERIMA KASIH ***
     </div>
 

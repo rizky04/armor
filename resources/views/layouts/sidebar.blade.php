@@ -84,9 +84,9 @@
                             <li>
                                 <a href="{{ route('services.fastServices') }}" class="{{ request()->routeIs('services.fastServices') ? 'active' : '' }}">Service Cepat</a>
                             </li>
-                            <li>
-                                <a href="{{ route('services.create') }}" class="{{ request()->routeIs('services.create') ? 'active' : '' }}">Service Baru</a>
-                            </li>
+                            {{-- <li>
+                                <a href="{{ route('services.create') }}" class="{{ request()->routeIs('services.create') ? 'active' : '' }}">Service Inap</a>
+                            </li> --}}
                             </li>
                                <li>
                                 <a href="{{ route('services.index') }}" class="{{ request()->routeIs('services.index') ? 'active' : '' }}">Data Service</a>

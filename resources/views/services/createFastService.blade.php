@@ -9,7 +9,7 @@
         </div>
         <div class="page-btn d-flex justify-content-between align-items-center gap-2">
             {{-- <button class="btn btn-added mr-1" id="add-client-btn">+ Add Client</button> --}}
-            {{-- <button class="btn btn-added" id="btn-add-kendaraan">+ Tambah Data Kendaraan Client</button> --}}
+            <button class="btn btn-added" id="btn-add-kendaraan">+ Tambah Data Kendaraan Client</button>
         </div>
 
     </div>
@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                  <!-- Spareparts -->
+                <!-- Spareparts -->
                 <div class="row mt-3">
                     <div class="col-lg-12">
                         <label>Spareparts</label>
@@ -106,7 +106,7 @@
                     </div>
                 </div>
 
-                 <!-- Spareparts -->
+                <!-- Spareparts -->
                 <div class="row mt-3">
                     <div class="col-lg-12">
                         <div class="table-responsive mb-3">
@@ -205,6 +205,120 @@
     </div>
     {{-- </div> --}}
     @include('services.modal.create-kendaraan')
+    <div class="modal fade" id="modalKendaraan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Kendaraan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="form-kendaraan">
+                    @csrf
+                    <div class="row">
+
+                        <div class="col-8">
+                            <label>Client</label>
+                            <select id="kendaraan_client" name="id_client" class="form-control"></select>
+                        </div>
+
+                        <div class="col-4 d-flex align-items-end">
+                            <button type="button"
+                                class="btn btn-sm btn-success w-100"
+                                id="btn-open-client-modal">
+                                + Tambah Client Baru
+                            </button>
+                        </div>
+
+                        <div class="col-6 mt-3">
+                            <label>Plat Nomor</label>
+                            <input type="text" name="license_plate" class="form-control" required>
+                        </div>
+
+                        <div class="col-6 mt-3">
+                            <label>Merek Kendaraan</label>
+                            <input type="text" name="brand" class="form-control">
+                        </div>
+
+                        <div class="col-6 mt-3">
+                            <label>Tipe</label>
+                            <input type="text" name="type" class="form-control">
+                        </div>
+
+                        <div class="col-6 mt-3">
+                            <label>No Mesin</label>
+                            <input type="text" name="engine_number" class="form-control">
+                        </div>
+
+                        <div class="col-6 mt-3">
+                            <label>No Rangka</label>
+                            <input type="text" name="chassis_number" class="form-control">
+                        </div>
+
+                        <div class="col-6 mt-3">
+                            <label>Foto Kendaraan</label>
+                            <input type="file" name="photo" class="form-control">
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-primary" id="btn-save-kendaraan">Simpan</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalClient" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Client Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="form-client">
+                    @csrf
+                    <div class="mb-3">
+                        <label>Nama Client</label>
+                        <input type="text" name="nama_client" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>No Telp</label>
+                        <input type="text" name="no_telp" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>No KTP</label>
+                        <input type="text" name="no_ktp" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Alamat</label>
+                        <textarea name="alamat" class="form-control" required></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-primary" id="btn-save-client">Simpan</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -223,30 +337,30 @@
 
             initVehicleSelect();
 
-         // ==================== TAMPILKAN JATUH TEMPO SAAT HUTANG ====================
-$('#due_date_div').hide(); // sembunyikan dulu di awal
+            // ==================== TAMPILKAN JATUH TEMPO SAAT HUTANG ====================
+            $('#due_date_div').hide(); // sembunyikan dulu di awal
 
-$('#status_pembayaran').on('change', function() {
-    const status = $(this).val();
+            $('#status_pembayaran').on('change', function() {
+                const status = $(this).val();
 
-    if (status === 'hutang') {
-        $('#due_date_div').slideDown(200);
-        $('[name="due_date"]').attr('required', true);
+                if (status === 'hutang') {
+                    $('#due_date_div').slideDown(200);
+                    $('[name="due_date"]').attr('required', true);
 
-        // otomatis isi tanggal +7 hari
-        const today = new Date();
-        today.setDate(today.getDate() + 7);
-        const next7 = today.toISOString().split('T')[0];
-        $('[name="due_date"]').val(next7);
+                    // otomatis isi tanggal +7 hari
+                    const today = new Date();
+                    today.setDate(today.getDate() + 7);
+                    const next7 = today.toISOString().split('T')[0];
+                    $('[name="due_date"]').val(next7);
 
-    } else {
-        $('#due_date_div').slideUp(200);
-        $('[name="due_date"]').val('').removeAttr('required');
-    }
-});
+                } else {
+                    $('#due_date_div').slideUp(200);
+                    $('[name="due_date"]').val('').removeAttr('required');
+                }
+            });
 
-// Jalankan di awal agar sinkron kalau status default bukan kosong
-$('#status_pembayaran').trigger('change');
+            // Jalankan di awal agar sinkron kalau status default bukan kosong
+            $('#status_pembayaran').trigger('change');
 
 
             function formatRupiah(angka) {
@@ -280,22 +394,22 @@ $('#status_pembayaran').trigger('change');
             //     $('#change').val(change > 0 ? change : 0);
             // }
             function updatePaymentFields(forceUpdate = false) {
-    const grandTotal = parseRupiah($('#grand-total').val());
-    let amountPaid = parseRupiah($('#amount_paid_display').val());
+                const grandTotal = parseRupiah($('#grand-total').val());
+                let amountPaid = parseRupiah($('#amount_paid_display').val());
 
-    // Jika belum manual atau paksa update otomatis
-    if (!isManualAmount || forceUpdate) {
-        amountPaid = grandTotal;
-        $('#amount_paid_display').val(formatRupiah(amountPaid));
-    }
+                // Jika belum manual atau paksa update otomatis
+                if (!isManualAmount || forceUpdate) {
+                    amountPaid = grandTotal;
+                    $('#amount_paid_display').val(formatRupiah(amountPaid));
+                }
 
-    const change = amountPaid - grandTotal;
-    const changeVal = change > 0 ? change : 0;
+                const change = amountPaid - grandTotal;
+                const changeVal = change > 0 ? change : 0;
 
-    $('#change_display').val(formatRupiah(changeVal));
-    $('#amount_paid').val(amountPaid);
-    $('#change').val(changeVal);
-}
+                $('#change_display').val(formatRupiah(changeVal));
+                $('#amount_paid').val(amountPaid);
+                $('#change').val(changeVal);
+            }
 
 
 
@@ -335,7 +449,7 @@ $('#status_pembayaran').trigger('change');
             // === Saat jumlah bayar diubah manual ===
             $(document).on('input', '#amount_paid_display', function() {
                 isManualAmount = true;
-    updatePaymentFields(false);
+                updatePaymentFields(false);
             });
 
             // mekanik
@@ -489,7 +603,7 @@ $('#status_pembayaran').trigger('change');
                         processResults: data => ({
                             results: data.map(item => ({
                                 id: item.id_barang,
-                                text: item.kode_barang + ' - ' + item.nama_barang ,
+                                text: item.kode_barang + ' - ' + item.nama_barang,
                                 price: item.harga_jual,
                                 purchase_price: item.harga_kulak
                             }))
@@ -593,88 +707,271 @@ $('#status_pembayaran').trigger('change');
                         // Kalau data baru → buka modal tambah kendaraan
                         const newPlate = data.text.replace(' (tambah kendaraan baru)', '');
 
+                        // Swal.fire({
+                        //     title: 'Tambah Kendaraan Baru',
+                        //     html: `
+                        //                 <div class="text-start">
+                        //                     <label>Client</label>
+                        //                     <select id="swal_client" class="form-control"></select>
+                        //                     <br>
+                        //                     <label>Plat Nomor</label>
+                        //                     <input type="text" id="swal_plate" class="form-control" value="${newPlate}">
+                        //                 </div>
+                        //             `,
+                        //     didOpen: () => {
+                        //         // Inisialisasi select2 client di dalam Swal
+                        //         $('#swal_client').select2({
+                        //             dropdownParent: $('.swal2-container'),
+                        //             ajax: {
+                        //                 url: "{{ route('select2.clients') }}",
+                        //                 dataType: 'json',
+                        //                 delay: 250,
+                        //                 data: params => ({
+                        //                     q: params.term
+                        //                 }),
+                        //                 processResults: data => ({
+                        //                     results: data.map(item => ({
+                        //                         id: item.id_client,
+                        //                         text: `${item.nama_client} - ${item.no_telp ?? ''}`
+                        //                     }))
+                        //                 })
+                        //             },
+                        //             placeholder: 'Pilih client...',
+                        //             width: '100%'
+                        //         });
+                        //     },
+                        //     showCancelButton: true,
+                        //     confirmButtonText: 'Simpan',
+                        //     cancelButtonText: 'Batal',
+                        //     preConfirm: () => {
+                        //         return {
+                        //             id_client: $('#swal_client').val(),
+                        //             license_plate: $('#swal_plate').val().trim()
+                        //         };
+                        //     }
+                        // }).then(result => {
+                        //     if (result.isConfirmed) {
+                        //         const formData = result.value;
+
+                        //         if (!formData.id_client || !formData.license_plate) {
+                        //             Swal.fire('Gagal', 'Client dan plat nomor wajib diisi.', 'warning');
+                        //             return;
+                        //         }
+
+                        //         $.ajax({
+                        //             url: "{{ route('vehicles.store') }}",
+                        //             method: 'POST',
+                        //             data: formData,
+                        //             success: function(res) {
+                        //                 if (res.status) {
+                        //                     const newOpt = new Option(
+                        //                         `${res.data.license_plate} - ${res.data.client.nama_client}`,
+                        //                         res.data.id,
+                        //                         true,
+                        //                         true
+                        //                     );
+                        //                     $('#vehicle_id').append(newOpt).trigger(
+                        //                         'change');
+                        //                     $('#id_client').val(res.data.id_client);
+
+                        //                     Swal.fire('Berhasil',
+                        //                         'Kendaraan baru berhasil ditambahkan',
+                        //                         'success');
+                        //                 } else {
+                        //                     Swal.fire('Error', res.message, 'error');
+                        //                 }
+                        //             },
+                        //             error: function() {
+                        //                 Swal.fire('Error',
+                        //                     'Terjadi kesalahan saat menyimpan kendaraan',
+                        //                     'error');
+                        //             }
+                        //         });
+                        //     }
+                        // });
                         Swal.fire({
-                            title: 'Tambah Kendaraan Baru',
-                            html: `
-                <div class="text-start">
-                    <label>Client</label>
-                    <select id="swal_client" class="form-control"></select>
-                    <br>
-                    <label>Plat Nomor</label>
-                    <input type="text" id="swal_plate" class="form-control" value="${newPlate}">
-                </div>
-            `,
-                            didOpen: () => {
-                                // Inisialisasi select2 client di dalam Swal
-                                $('#swal_client').select2({
-                                    dropdownParent: $('.swal2-container'),
-                                    ajax: {
-                                        url: "{{ route('select2.clients') }}",
-                                        dataType: 'json',
-                                        delay: 250,
-                                        data: params => ({
-                                            q: params.term
-                                        }),
-                                        processResults: data => ({
-                                            results: data.map(item => ({
-                                                id: item.id_client,
-                                                text: `${item.nama_client} - ${item.no_telp ?? ''}`
-                                            }))
-                                        })
-                                    },
-                                    placeholder: 'Pilih client...',
-                                    width: '100%'
-                                });
-                            },
-                            showCancelButton: true,
-                            confirmButtonText: 'Simpan',
-                            cancelButtonText: 'Batal',
-                            preConfirm: () => {
-                                return {
-                                    id_client: $('#swal_client').val(),
-                                    license_plate: $('#swal_plate').val().trim()
-                                };
-                            }
-                        }).then(result => {
-                            if (result.isConfirmed) {
-                                const formData = result.value;
+    title: 'Tambah Kendaraan Baru',
+    html: `
+        <div class="text-start">
+            <label>Client</label>
+            <select id="swal_client" class="form-control"></select>
 
-                                if (!formData.id_client || !formData.license_plate) {
-                                    Swal.fire('Gagal', 'Client dan plat nomor wajib diisi.', 'warning');
-                                    return;
-                                }
+            <!-- tombol tambah client -->
+            <button type="button" id="btn-add-client" class="btn btn-sm btn-primary mt-2">
+                + Tambah Client Baru
+            </button>
 
-                                $.ajax({
-                                    url: "{{ route('vehicles.store') }}",
-                                    method: 'POST',
-                                    data: formData,
-                                    success: function(res) {
-                                        if (res.status) {
-                                            const newOpt = new Option(
-                                                `${res.data.license_plate} - ${res.data.client.nama_client}`,
-                                                res.data.id,
-                                                true,
-                                                true
-                                            );
-                                            $('#vehicle_id').append(newOpt).trigger(
-                                                'change');
-                                            $('#id_client').val(res.data.id_client);
+            <br><br>
 
-                                            Swal.fire('Berhasil',
-                                                'Kendaraan baru berhasil ditambahkan',
-                                                'success');
-                                        } else {
-                                            Swal.fire('Error', res.message, 'error');
-                                        }
-                                    },
-                                    error: function() {
-                                        Swal.fire('Error',
-                                            'Terjadi kesalahan saat menyimpan kendaraan',
-                                            'error');
-                                    }
-                                });
-                            }
-                        });
+            <label>Plat Nomor</label>
+            <input type="text" id="swal_plate" class="form-control" value="${newPlate}">
+        </div>
+    `,
+    didOpen: () => {
+        $('#swal_client').select2({
+            dropdownParent: $('.swal2-container'),
+            ajax: {
+                url: "{{ route('select2.clients') }}",
+                dataType: 'json',
+                delay: 250,
+                data: params => ({ q: params.term }),
+                processResults: data => ({
+                    results: data.map(item => ({
+                        id: item.id_client,
+                        text: `${item.nama_client} - ${item.no_telp ?? ''}`
+                    }))
+                })
+            },
+            placeholder: 'Pilih client...',
+            width: '100%'
+        });
+
+        // EVENT CLICK TAMBAH CLIENT
+        // $('#btn-add-client').on('click', function() {
+        //     Swal.fire({
+        //         title: 'Tambah Client Baru',
+        //         html: `
+        //             <input id="new_nama" class="swal2-input" placeholder="Nama lengkap">
+        //             <input id="new_telp" class="swal2-input" placeholder="No Telp">
+        //             <input id="new_ktp" class="swal2-input" placeholder="No KTP">
+        //             <textarea id="new_alamat" class="swal2-textarea" placeholder="Alamat"></textarea>
+        //         `,
+        //         showCancelButton: true,
+        //         confirmButtonText: 'Simpan',
+        //         preConfirm: () => ({
+        //             nama_client: $('#new_nama').val(),
+        //             no_telp: $('#new_telp').val(),
+        //             no_ktp: $('#new_ktp').val(),
+        //             alamat: $('#new_alamat').val()
+        //         })
+        //     }).then(clientRes => {
+        //         if (clientRes.isConfirmed) {
+        //             $.ajax({
+        //                 url: "{{ route('client.store') }}",
+        //                 method: "POST",
+        //                 data: clientRes.value,
+        //                 success: function(res) {
+        //                     if (res.data) {
+        //                         // masukkan client baru ke dropdown
+        //                         const opt = new Option(
+        //                             `${res.data.nama_client} - ${res.data.no_telp}`,
+        //                             res.data.id_client,
+        //                             true,
+        //                             true
+        //                         );
+
+        //                         $('#swal_client')
+        //                             .append(opt)
+        //                             .trigger('change');
+
+        //                         Swal.fire('Berhasil', 'Client baru ditambahkan', 'success');
+        //                     }
+        //                 },
+        //                 error: () =>
+        //                     Swal.fire('Error', 'Gagal menambah client', 'error')
+        //             });
+        //         }
+        //     });
+        // });
+        $('#btn-add-client').on('click', function () {
+    Swal.fire({
+        title: 'Tambah Client Baru',
+        html: `
+            <input id="new_nama" class="swal2-input" placeholder="Nama lengkap">
+            <input id="new_telp" class="swal2-input" placeholder="No Telp">
+            <input id="new_ktp" class="swal2-input" placeholder="No KTP">
+            <textarea id="new_alamat" class="swal2-textarea" placeholder="Alamat"></textarea>
+        `,
+        confirmButtonText: 'Simpan',
+        cancelButtonText: 'Batal',
+        showCancelButton: true,
+        focusConfirm: false,
+        preConfirm: () => {
+            const data = {
+                nama_client: $('#new_nama').val(),
+                no_telp: $('#new_telp').val(),
+                no_ktp: $('#new_ktp').val(),
+                alamat: $('#new_alamat').val(),
+            };
+
+            // VALIDASI MANUAL
+            if (!data.nama_client || !data.no_telp || !data.no_ktp || !data.alamat) {
+                Swal.showValidationMessage('Semua field wajib diisi');
+                return false;
+            }
+
+            // AJAX SIMPAN CLIENT
+            return $.ajax({
+                url: "{{ route('client.store') }}",
+                method: "POST",
+                data: data,
+            }).then(function (res) {
+
+                // TAMBAHKAN KE SELECT2 DI MODAL KENDARAAN
+                const newOpt = new Option(
+                    `${res.data.nama_client} - ${res.data.no_telp ?? ''}`,
+                    res.data.id_client,
+                    true,
+                    true
+                );
+
+                $('#swal_client').append(newOpt).trigger('change');
+
+                // tampilkan notif sukses
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Client berhasil ditambahkan',
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+            }).catch(function () {
+                Swal.showValidationMessage('Gagal menyimpan client');
+            });
+        }
+    });
+});
+
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Simpan',
+    cancelButtonText: 'Batal',
+    preConfirm: () => ({
+        id_client: $('#swal_client').val(),
+        license_plate: $('#swal_plate').val().trim()
+    })
+}).then(result => {
+    if (result.isConfirmed) {
+        const formData = result.value;
+
+        if (!formData.id_client || !formData.license_plate) {
+            Swal.fire('Gagal', 'Client dan plat nomor wajib diisi.', 'warning');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('vehicles.store') }}",
+            method: 'POST',
+            data: formData,
+            success: function(res) {
+                if (res.status) {
+                    const newOpt = new Option(
+                        `${res.data.license_plate} - ${res.data.client.nama_client}`,
+                        res.data.id,
+                        true,
+                        true
+                    );
+                    $('#vehicle_id').append(newOpt).trigger('change');
+                    $('#id_client').val(res.data.id_client);
+
+                    Swal.fire('Berhasil', 'Kendaraan baru berhasil ditambahkan', 'success');
+                }
+            }
+        });
+    }
+});
+
                     });
             }
 
@@ -741,22 +1038,22 @@ $('#status_pembayaran').trigger('change');
                                                     .val(null)
                                                     .trigger(
                                                         'change'
-                                                        );
+                                                    );
                                                 $('#mekanik')
                                                     .val(null)
                                                     .trigger(
                                                         'change'
-                                                        );
+                                                    );
                                                 $('#vehicle_id')
                                                     .val(null)
                                                     .trigger(
                                                         'change'
-                                                        );
+                                                    );
                                                 $('#id_client')
                                                     .val(null)
                                                     .trigger(
                                                         'change'
-                                                        );
+                                                    );
                                                 $('#id_client')
                                                     .val('');
                                                 $('#jobs-table tbody')
@@ -776,7 +1073,7 @@ $('#status_pembayaran').trigger('change');
                                                         false)
                                                     .text(
                                                         'Simpan'
-                                                        );
+                                                    );
                                                 $('#btn-print')
                                                     .remove();
 
@@ -800,7 +1097,7 @@ $('#status_pembayaran').trigger('change');
 
                                 if (xhr.status === 422) {
                                     $.each(xhr.responseJSON.errors, function(key,
-                                    value) {
+                                        value) {
                                         $(`[name="${key}"]`).addClass(
                                             'is-invalid');
                                         $(`#error-${key}`).text(value[0]);
@@ -920,7 +1217,7 @@ $('#status_pembayaran').trigger('change');
                     // Efek highlight hijau sebentar
                     existingRow.addClass('table-success');
                     setTimeout(() => existingRow.removeClass('table-success'), 700);
-isManualAmount = false;
+                    isManualAmount = false;
                     calculateGrandTotal();
                     return;
                 }
@@ -967,5 +1264,84 @@ isManualAmount = false;
             }
 
         });
+
+        // =================== BUKA MODAL CLIENT ===================
+$('#add-client-btn, #btn-open-client-modal').on('click', function () {
+    $('#modalClient').modal('show');
+});
+
+
+// =================== SIMPAN CLIENT ===================
+$('#btn-save-client').on('click', function () {
+
+    let form = $('#form-client')[0];
+    let data = new FormData(form);
+
+    $.ajax({
+        url: "{{ route('client.store') }}",
+        method: "POST",
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function (res) {
+
+            // Tambahkan ke semua select client
+            const opt = new Option(
+                `${res.data.nama_client} - ${res.data.no_telp ?? ''}`,
+                res.data.id_client,
+                true,
+                true
+            );
+
+            $('#kendaraan_client').append(opt).trigger('change');
+
+            Swal.fire('Berhasil', 'Client berhasil ditambahkan', 'success');
+            $('#modalClient').modal('hide');
+        },
+        error: () => Swal.fire('Error', 'Gagal menambah client', 'error')
+    });
+
+});
+
+
+// =================== BUKA MODAL KENDARAAN ===================
+$('#btn-add-kendaraan').on('click', function () {
+    $('#modalKendaraan').modal('show');
+});
+
+
+// =================== SIMPAN KENDARAAN ===================
+$('#btn-save-kendaraan').on('click', function () {
+
+    let form = $('#form-kendaraan')[0];
+    let data = new FormData(form);
+
+    $.ajax({
+        url: "{{ route('vehicles.store') }}",
+        method: "POST",
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function (res) {
+
+            // masukkan ke select kendaraan di form service
+            const opt = new Option(
+                `${res.data.license_plate} - ${res.data.client.nama_client}`,
+                res.data.id,
+                true,
+                true
+            );
+
+            $('#vehicle_id').append(opt).trigger('change');
+            $('#id_client').val(res.data.id_client);
+
+            Swal.fire('Berhasil', 'Kendaraan berhasil ditambahkan', 'success');
+            $('#modalKendaraan').modal('hide');
+        },
+        error: () => Swal.fire('Error', 'Gagal menambah kendaraan', 'error')
+    });
+
+});
+
     </script>
 @endpush
