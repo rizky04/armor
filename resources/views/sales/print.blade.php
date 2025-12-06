@@ -1,120 +1,146 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Penjualan #{{ $sales->nomor_sales }}</title>
+<meta charset="UTF-8">
+<title>Invoice Penjualan #{{ $sales->nomor_sales }}</title>
 
-   <style>
-    @media print {
-        @page {
-            size: 241mm auto; /* ukuran continuous form dot matrix */
-            margin: 0;
-        }
+<style>
+@media print {
+    @page {
+        size: 235mm 148mm; /* continuous form */
+        margin: 4mm;
     }
+}
 
-    body {
-        width: 235mm; /* <── dikurangi dari 241mm supaya ada jarak kiri kanan */
-        margin: 0 auto;  /* center otomatis */
-        padding: 5mm 8mm; /* <── ruang kanan kiri */
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        line-height: 1.25;
-    }
+body {
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.25;
+}
 
-    .center { text-align: center; }
-    .right { text-align: right; }
-    .bold { font-weight: bold; }
+.wrapper {
+    width: 230mm;
+    margin: auto;
+}
 
-    .line {
-        border-top: 1px dashed #000;
-        margin: 6px 0;
-    }
+table { width: 100%; border-collapse: collapse; }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+.line {
+    border-bottom: 1px dashed #000;
+    margin: 2px 0;
+}
 
-    table td {
-        padding: 3px 2px;
-        vertical-align: top;
-    }
+.header td {
+    vertical-align: top;
+    padding-bottom: 4px;
+}
 </style>
-
 </head>
+
 <body>
 
-    <!-- HEADER -->
-    <div class="center bold" style="font-size: 15px;">ARMOR MOTOR</div>
-    <div class="center">Jl. Raya Nyorondung No. 96, Pamorah</div>
-    <div class="center">Bangkalan | Telp: 0878-4513-3640</div>
+<div class="wrapper">
 
-    <div class="line"></div>
+<!-- TITLE TENGAH -->
+<div style="text-align:center; margin-bottom:10px;">
+    <strong>INVOICE PENJUALAN</strong><br>
+    No: {{ $sales->nomor_sales }}
+</div>
 
-    <div class="bold center">INVOICE</div>
+<!-- HEADER MIRIP INVOICE SERVICE -->
+<table class="header">
+    <tr>
+        <td style="width:50%;">
+            Tanggal : {{ \Carbon\Carbon::parse($sales->sales_date)->format('d M Y') }}<br>
+            Nama : {{ $sales->client->nama_client ?? '-' }}<br>
+            Telp : {{ $sales->client->no_telp ?? '-' }}<br>
+            Status : {{ $sales->total_paid >= $sales->total ? 'LUNAS' : 'BELUM LUNAS' }}
+        </td>
 
-    <table>
+        <td style="width:50%; text-align:right;">
+            <b>ARMOR GARAGE - SHOWROOM & SERVICE</b><br>
+            Jl. Raya Bancaran<br>
+            Bangkalan, Jawa Timur<br>
+            0895-2354-1922
+        </td>
+    </tr>
+</table>
+
+<div class="line"></div>
+
+<!-- TABEL BARANG MIRIP STRUK -->
+<table>
+    <tr style="border-bottom:1px dashed #000; font-weight:bold;">
+        <td style="width:60%;">Nama Barang</td>
+        <td style="width:10%; text-align:center;">Qty</td>
+        <td style="width:30%; text-align:right;">Subtotal</td>
+    </tr>
+
+    @php $grandTotal = 0; @endphp
+    @foreach($sales->items as $item)
+        @php $grandTotal += $item->subtotal; @endphp
         <tr>
-            <td>No Invoice</td><td>:</td><td>{{ $sales->nomor_sales }}</td>
-            <td class="right">Tanggal : {{ \Carbon\Carbon::parse($sales->sales_date)->format('d/m/Y') }}</td>
+            <td>{{ $item->barang->nama_barang }} {{ $item->barang->merk_barang ?? '' }}</td>
+            <td style="text-align:center;">{{ $item->qty }}</td>
+            <td style="text-align:right;">{{ number_format($item->subtotal,0,',','.') }}</td>
         </tr>
-    </table>
+    @endforeach
+</table>
 
-    <div class="line"></div>
+<div class="line"></div>
 
-    <table>
-        <tr><td>Nama</td><td>:</td><td>{{ $sales->client->nama_client ?? '-' }}</td></tr>
-        <tr><td>Telp</td><td>:</td><td>{{ $sales->client->no_telp ?? '-' }}</td></tr>
-        <tr>
-            <td>Status</td>
-            <td>:</td>
-            <td>{{ $sales->total_paid >= $sales->total ? 'LUNAS' : 'BELUM LUNAS' }}</td>
-        </tr>
-    </table>
+<!-- TOTAL + SOSMED/KETERANGAN DALAM SATU TABEL -->
+<table style="width:100%; line-height:1.2;">
+    <tr>
+        <!-- KIRI -->
+        <td style="width:65%; vertical-align:top;">
+            Rek BCA No: 185.1538.661 a/n Amarullah Rizki<br>
+            Rek BRI No: 610701006387501 a/n Amarullah Rizki<br>
+            IG: @armor.garage | TikTok: @armor.garage
+        </td>
 
-    <div class="line"></div>
+        <!-- KANAN -->
+        <td style="width:20%;">Total</td>
+        <td style="width:15%; text-align:right;">
+            {{ number_format($grandTotal,0,',','.') }}
+        </td>
+    </tr>
 
-    <table>
-        <tr>
-            <td class="bold">Nama Barang</td>
-            <td class="bold center">Qty</td>
-            <td class="bold right">Subtotal</td>
-        </tr>
+    <tr>
+        <td></td>
+        <td>Dibayar</td>
+        <td style="text-align:right;">
+            {{ number_format($sales->total_paid,0,',','.') }}
+        </td>
+    </tr>
 
-        @php $grandTotal = 0; @endphp
-        @foreach($sales->items as $item)
-            @php $grandTotal += $item->subtotal; @endphp
-            <tr>
-                <td>{{ $item->barang->nama_barang ?? '' }} {{ $item->barang->merk_barang ?? '' }}</td>
-                <td class="center">{{ $item->qty }}</td>
-                <td class="right">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
-            </tr>
-        @endforeach
-    </table>
+    <tr>
+        <td></td>
+        <td>Sisa</td>
+        <td style="text-align:right;">
+            {{ number_format($sales->due_amount,0,',','.') }}
+        </td>
+    </tr>
 
-    <div class="line"></div>
+    <tr>
+        <td></td>
+        <td><b>Kembali</b></td>
+        <td style="text-align:right;">
+            <b>{{ number_format($sales->payments->last()->change_amount ?? 0,0,',','.') }}</b>
+        </td>
+    </tr>
+</table>
 
-    <table>
-        <tr><td>Total</td><td class="right bold">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td></tr>
-        <tr><td>Dibayar</td><td class="right bold">Rp {{ number_format($sales->total_paid, 0, ',', '.') }}</td></tr>
-        <tr><td>Sisa</td><td class="right bold">Rp {{ number_format($sales->due_amount, 0, ',', '.') }}</td></tr>
-        <tr>
-            <td>Kembali</td>
-            <td class="right bold">Rp {{ number_format($sales->payments->last()->change_amount ?? 0, 0, ',', '.') }}</td>
-        </tr>
-    </table>
+<div class="line"></div>
 
-    <div class="line"></div>
+<div style="text-align:center; margin-top:4px; font-weight:bold;">
+    TERIMA KASIH ATAS PEMBELIAN ANDA!
+</div>
 
-    <div class="center bold" style="margin-top: 5px;">
-        Terima kasih atas kepercayaan Anda!
-    </div>
-
-</body>
+</div>
 
 <script>
-    window.onload = () => window.print();
+window.onload = () => window.print();
 </script>
-
+</body>
 </html>
