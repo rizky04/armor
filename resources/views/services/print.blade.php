@@ -5,12 +5,19 @@
 <title>Invoice Service #{{ $service->nomor_service }}</title>
 
 <style>
-@media print {
+/* @media print {
     @page {
-        size: 235mm 148mm; /* ukuran kertas continuous form */
+        size: 235mm 148mm;
         margin: 4mm;
     }
-}
+} */
+
+  @media print {
+        @page {
+            size: A4;
+            margin: 5mm;
+        }
+    }
 
 body {
     font-family: "Courier New", monospace;
