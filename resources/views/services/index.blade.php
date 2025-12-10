@@ -27,7 +27,7 @@
                             <th>Action</th>
                             <th>Detail</th>
                             <th>Tipe <br> Pembayaran</th>
-                            <th>Nama Pemilik <br> Plat nomor</th>
+                            <th>Nama Pemilik <br>type</th>
                             <th>Referece</th>
                             <th>Status <br> service</th>
                             <th>Bayar</th>
@@ -156,7 +156,7 @@
                                             <td>${s.payment?.payment_type || '-'}</td>
                  <td>
                      ${s.vehicle.client?.nama_client || '-'} <br>
-                    ${s.vehicle.license_plate || '-'}
+                    ${s.vehicle.type || '-'}
                 </td>
                 <td>${s.nomor_service || '-'}</td>
                 <td>
