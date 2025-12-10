@@ -95,7 +95,7 @@
                         <tr data-key="{{ $loop->index }}">
                             <td>
                                 <select name="jobs[{{ $loop->index }}][id_jasa]" class="form-control select2-jasa">
-                                    <option value="{{ $job->jasa->id_jasa }}" selected>{{ $job->jasa->nama_jasa }}
+                                    <option value="{{ $job->jasa->id_jasa ?? null}}" selected>{{ $job->jasa->nama_jasa ?? null}}
                                     </option>
                                 </select>
                             </td>
@@ -144,7 +144,7 @@
                             <td>
                                 <select name="spareparts[{{ $loop->index }}][id_barang]"
                                     class="form-control select2-sparepart">
-                                    <option value="{{ $spare->barang->id_barang }}" selected>
+                                    <option value="{{ $spare->barang->id_barang ?? null }}" selected>
                                         {{ $spare->barang->nama_barang }}</option>
                                 </select>
                             </td>
