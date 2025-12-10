@@ -145,7 +145,7 @@
                                 <select name="spareparts[{{ $loop->index }}][id_barang]"
                                     class="form-control select2-sparepart">
                                     <option value="{{ $spare->barang->id_barang ?? null }}" selected>
-                                        {{ $spare->barang->nama_barang }}</option>
+                                        {{ $spare->barang->nama_barang ?? null }}</option>
                                 </select>
                             </td>
                             <td>
