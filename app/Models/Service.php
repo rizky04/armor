@@ -14,6 +14,9 @@ class Service extends Model
     protected $fillable = [
         'nomor_service',
         'vehicle_id',
+        'manual_customer_name',  // Kolom baru
+    'manual_license_plate',  // Kolom baru
+    'manual_vehicle_name',   // Kolom baru
         'created_by',
         'updated_by',
         'service_date',

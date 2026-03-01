@@ -12,6 +12,29 @@
         @csrf
         @method('PUT')
 
+        <div class="row">
+    <div class="col-lg-4 col-sm-6 col-12">
+        <div class="form-group">
+            <label>Nama Customer <span class="text-danger">*</span></label>
+            <input type="text" name="manual_customer_name" class="form-control" value="{{ $service->manual_customer_name }}" placeholder="Input Nama" required>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-sm-6 col-12">
+        <div class="form-group">
+            <label>Plat Nomor <span class="text-danger">*</span></label>
+            <input type="text" name="manual_license_plate" class="form-control" value="{{ $service->manual_license_plate }}" placeholder="B 1234 ABC" required>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-sm-6 col-12">
+        <div class="form-group">
+            <label>Nama Kendaraan</label>
+            <input type="text" name="manual_vehicle_name" class="form-control" value="{{ $service->manual_vehicle_name }}" placeholder="Contoh: Vario 150">
+        </div>
+    </div>
+</div>
+
         {{-- ===================== --}}
         {{-- Info Service --}}
         {{-- ===================== --}}
@@ -20,12 +43,12 @@
                 <div class="mb-3 col-md-6">
                     <label>Vehicle</label>
                     <select name="vehicle_id" id="vehicle_id" class="form-control select2-vehicle">
-                        <option value="{{ $service->vehicle->id }}">
-                            {{ $service->vehicle->license_plate }} - {{ $service->vehicle->client->nama_client }}
+                        <option value="{{ $service->vehicle->id ?? '' }}" selected>
+                            {{ $service->vehicle->license_plate ?? '' }} - {{ $service->vehicle->client->nama_client  ?? '' }}
                         </option>
                     </select>
                     <input type="hidden" id="id_client" name="id_client"
-                        value="{{ $service->vehicle->client->id_client }}">
+                        value="{{ $service->vehicle->client->id_client ?? '' }}">
                 </div>
 
                 <div class="mb-3 col-md-6">

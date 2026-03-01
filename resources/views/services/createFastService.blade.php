@@ -19,12 +19,13 @@
         <div class="card-body">
             <form id="service-form">
                 @csrf
+
                 <div class="row">
                     <!-- Kendaraan -->
                     <div class="col-lg-6 col-sm-6 col-6">
                         <div class="form-group">
-                            <label>Kendaraan (Customer)</label>
-                            <select id="vehicle_id" name="vehicle_id" class="form-control" required></select>
+                            <label>Kendaraan (Customer) lama (tidak wajid di isi)</label>
+                            <select id="vehicle_id" name="vehicle_id" class="form-control"></select>
                             <div class="invalid-feedback" id="error-vehicle_id"></div>
                         </div>
                         <input type="hidden" id="id_client" name="id_client">
@@ -44,6 +45,28 @@
                     </div>
                 </div>
 
+                     <div class="row">
+    <div class="col-lg-4 col-sm-6 col-12">
+        <div class="form-group">
+            <label>Nama Customer <span class="text-danger">*</span></label>
+            <input type="text" name="manual_customer_name" class="form-control" placeholder="Input Nama" required>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-sm-6 col-12">
+        <div class="form-group">
+            <label>Plat Nomor <span class="text-danger">*</span></label>
+            <input type="text" name="manual_license_plate" class="form-control" placeholder="B 1234 ABC" required>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-sm-6 col-12">
+        <div class="form-group">
+            <label>Nama Kendaraan</label>
+            <input type="text" name="manual_vehicle_name" class="form-control" placeholder="Contoh: Vario 150">
+        </div>
+    </div>
+</div>
                 <!-- Spareparts -->
                 <div class="row mt-3">
                     <div class="col-lg-12">

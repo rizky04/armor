@@ -155,8 +155,11 @@
                                             </td>
                                             <td>${s.payment?.payment_type || '-'}</td>
                  <td>
-                     ${s.vehicle.client?.nama_client || '-'} <br>
-                    ${s.vehicle.type || '-'}
+                     ${s.vehicle?.client?.nama_client || ''} <br>
+                    ${s.vehicle?.type || ''}
+                     ${s.manual_customer_name || '-'} <br>
+                    ${s.manual_vehicle_name || '-'} <br>
+                        ${s.manual_license_plate || '-'}
                 </td>
                 <td>${s.nomor_service || '-'}</td>
                 <td>

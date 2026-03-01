@@ -97,7 +97,10 @@ class ServiceController extends Controller
     {
         // dd($request->all());
         $request->validate([
-            'vehicle_id'   => 'required|exists:vehicles,id',
+            'vehicle_id'   => 'nullable|exists:vehicles,id',
+            'manual_customer_name' => 'nullable|string',  // Kolom baru
+            'manual_license_plate' => 'nullable|string',  // Kolom baru
+            'manual_vehicle_name' => 'nullable|string',   // Kolom baru
             // 'service_date' => 'required|date',
             'estimate_date' => 'nullable|date',
             'estimate_date' => 'nullable|date',
@@ -162,6 +165,9 @@ class ServiceController extends Controller
             // simpan service utama
             $service = Service::create([
                 'vehicle_id'     => $request->vehicle_id,
+                'manual_customer_name' => $request->manual_customer_name,  // Kolom baru
+            'manual_license_plate' => $request->manual_license_plate,  // Kolom baru
+            'manual_vehicle_name' => $request->manual_vehicle_name,   // Kolom baru
                 'service_date'   =>   now(),
                 'estimate_date' =>  $request->estimate_date,
                 'due_date'      =>  $request->due_date,
@@ -331,7 +337,10 @@ class ServiceController extends Controller
     {
         // dd($request->all());
         $request->validate([
-            'vehicle_id' => 'required|exists:vehicles,id',
+            'vehicle_id' => 'nullable|exists:vehicles,id',
+             'manual_customer_name' => 'nullable|string',  // Kolom baru
+            'manual_license_plate' => 'nullable|string',  // Kolom baru
+            'manual_vehicle_name' => 'nullable|string',   // Kolom baru
             // 'service_date' => 'required|date',
             'estimate_date' => 'nullable|date',
             'due_date' => 'nullable|date',
@@ -438,6 +447,9 @@ class ServiceController extends Controller
             // Update utama service
         $service->update([
             'vehicle_id'   => $request->vehicle_id,
+              'manual_customer_name' => $request->manual_customer_name,  // Kolom baru
+            'manual_license_plate' => $request->manual_license_plate,  // Kolom baru
+            'manual_vehicle_name' => $request->manual_vehicle_name,
             'service_date' => $serviceDate,
             'estimate_date'=> $request->estimate_date,
             'due_date'     => $request->due_date,

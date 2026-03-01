@@ -59,8 +59,9 @@
         <tr>
             <td style="width:50%;">
                 Tanggal : {{ \Carbon\Carbon::parse($service->service_date)->format('d M Y') }}<br>
-                Kepada : {{ $service->vehicle->client->nama_client ?? '-' }}<br>
-                Plat  : {{ $service->vehicle->license_plate ?? '-' }}<br>
+                Kepada : {{ $service->vehicle->client->nama_client ?? $service->manual_customer_name ?? '-' }}<br>
+                type : {{ $service->manual_vehicle_name ?? '-' }}<br>
+                Plat  : {{ $service->vehicle->license_plate ?? $service->manual_license_plate ?? '-' }}<br>
             </td>
 
             <td style="width:50%; text-align:right;">
