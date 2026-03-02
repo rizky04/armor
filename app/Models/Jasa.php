@@ -15,6 +15,7 @@ class Jasa extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
+        'kode_jasa',
         'nama_jasa',
         'harga_jasa',
         'jenis',

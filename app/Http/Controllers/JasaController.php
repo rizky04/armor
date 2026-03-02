@@ -28,11 +28,13 @@ class JasaController extends Controller
         $validated = $request->validate([
             'nama_jasa'  => 'required|string|max:255',
             'harga_jasa' => 'required|numeric|min:0',
+            'kode_jasa'  => 'nullable|string|max:255',
 
         ]);
 
         $jasa = Jasa::create([
             'nama_jasa'  => $validated['nama_jasa'],
+            'kode_jasa'  => $validated['kode_jasa'],
             'harga_jasa' => $validated['harga_jasa'],
             'jenis' => 'auto',
             'hapus'      => 0,
@@ -49,7 +51,7 @@ class JasaController extends Controller
     public function update(Request $request, $id)
     {
         $jasa = Jasa::findOrFail($id);
-        $jasa->update($request->only(['nama_jasa','harga_jasa']));
+        $jasa->update($request->only(['nama_jasa','harga_jasa','kode_jasa']));
         return response()->json(['message' => 'Jasa berhasil diperbarui']);
     }
 
@@ -64,6 +66,7 @@ class JasaController extends Controller
     {
         $validated = $request->validate([
             'nama_jasa'  => 'required|string|max:255',
+            'kode_jasa'  => 'nullable|string|max:255',
             'harga_jasa' => 'required|numeric|min:0',
 
         ]);
@@ -71,6 +74,7 @@ class JasaController extends Controller
         $jasa = Jasa::create([
             'nama_jasa'  => $validated['nama_jasa'],
             'harga_jasa' => $validated['harga_jasa'],
+            'kode_jasa' => $validated['kode_jasa'],
             'jenis' => 'manual',
             'hapus'      => 0,
         ]);

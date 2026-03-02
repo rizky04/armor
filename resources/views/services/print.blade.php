@@ -77,7 +77,7 @@
 
     <table class="item-table">
         <tr style="border-bottom:1px dashed #000; font-weight:bold;">
-            <td style="width:18%;">Kode Barang</td>
+            <td style="width:18%;">Kode</td>
             <td style="width:40%;">Nama Barang</td>
             <td style="width:5%;">Qty</td>
             <td style="width:19%;">@Harga</td>
@@ -100,7 +100,7 @@
         @foreach($service->jobs as $job)
             @php $totalJasa += $job->subtotal; @endphp
             <tr>
-                <td>-</td>
+                <td>{{ $job->jasa->kode_jasa }}</td>
                 <td>{{ $job->jasa->nama_jasa }}</td>
                 <td>{{ $job->qty }}</td>
                 <td>{{ number_format($job->jasa->harga_jasa ?? 0,0,',','.') }}</td>

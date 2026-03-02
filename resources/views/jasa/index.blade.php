@@ -25,6 +25,7 @@
                     <tr>
                         <th>#</th>
                         <th>Nama Jasa</th>
+                        <th>Kode Jasa</th>
                         <th>Harga Jasa</th>
                         <th>Aksi</th>
                     </tr>
@@ -53,6 +54,10 @@
             <div class="mb-2">
                 <label>Nama Jasa</label>
                 <input type="text" id="nama_jasa" class="form-control" required>
+            </div>
+             <div class="mb-2">
+                <label>Kode Jasa</label>
+                <input type="text" id="kode_jasa" class="form-control">
             </div>
             <div class="mb-2">
                 <label>Harga Jasa</label>
@@ -88,6 +93,7 @@ function loadJasa(page = 1, search = '') {
                 <tr>
                     <td>${++i}</td>
                     <td>${j.nama_jasa}</td>
+                    <td>${j.kode_jasa || '-'}</td>
                     <td>${formatRupiah(j.harga_jasa)}</td>
                     <td>
                         <button class="btn btn-sm btn-warning btn-edit" data-id="${j.id_jasa}">Edit</button>
@@ -143,6 +149,7 @@ $(document).ready(function() {
             method: method,
             data: {
                 nama_jasa: $('#nama_jasa').val(),
+                kode_jasa: $('#kode_jasa').val(),
                 harga_jasa: $('#harga_jasa').val(),
                 _token: "{{ csrf_token() }}"
             },
@@ -159,6 +166,7 @@ $(document).ready(function() {
         $.get(`/jasa/${id}`, function(j) {
             $('#id_jasa').val(j.id_jasa);
             $('#nama_jasa').val(j.nama_jasa);
+            $('#kode_jasa').val(j.kode_jasa);
             $('#harga_jasa').val(j.harga_jasa);
             $('#jasaModal .modal-title').text('Edit Jasa');
             $('#jasaModal').modal('show');

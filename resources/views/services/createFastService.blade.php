@@ -554,14 +554,15 @@
                         Swal.fire({
                             title: 'Jasa baru',
                             html: `
-                    <input type="text" id="nama_jasa" class="swal2-input"
-                           value="${data.text.replace(' (buat baru)', '')}">
+                    <input type="text" id="nama_jasa" class="swal2-input" value="${data.text.replace(' (buat baru)', '')}">
+                     <input type="text" id="kode_jasa" class="swal2-input" placeholder="Kode jasa">
                     <input type="number" id="harga_jasa" class="swal2-input" placeholder="Harga jasa">
                 `,
                             focusConfirm: false,
                             preConfirm: () => {
                                 return {
                                     nama_jasa: document.getElementById('nama_jasa').value,
+                                    kode_jasa: document.getElementById('kode_jasa').value,
                                     harga_jasa: document.getElementById('harga_jasa').value
                                 };
                             },
