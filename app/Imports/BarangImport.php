@@ -19,8 +19,9 @@ class BarangImport implements ToModel, WithHeadingRow
         // Library ini biasanya otomatis mengubah header "Kode Barang" menjadi "kode_barang"
 
         return Barang::updateOrCreate(
-            ['kode_barang' => $row['kode_barang']], // Kunci pencarian (agar tidak duplikat)
+            // ['kode_barang' => $row['kode_barang']], // Kunci pencarian (agar tidak duplikat)
             [
+                'kode_barang' => $row['kode_barang'],
                 'nama_barang' => $row['nama_barang'],
                 'merk_barang' => $row['merk_barang'],
                 'keterangan'  => $row['keterangan'] ?? '-', // Default value jika kosong
