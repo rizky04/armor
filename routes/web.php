@@ -32,6 +32,9 @@ use App\Http\Controllers\StokTransactionController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\OilServiceController;
 use App\Http\Controllers\KasirReportController;
+use App\Http\Controllers\TransaksiMotorController;
+use App\Http\Controllers\PengeluaranController;
+use App\Http\Controllers\PenjualanPlatformController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BarangTemplateExport;
 
@@ -289,6 +292,46 @@ Route::get('reportBarangJasa', [ReportController::class, 'reportBarangJasa'])->n
 
 Route::get('/report-combined', [ReportController::class, 'combined']);
 
+
+// Penjualan Platform (Shopee, dll)
+Route::prefix('penjualan-platform')->group(function () {
+    Route::get('/', [PenjualanPlatformController::class, 'index'])->name('penjualan-platform.index');
+    Route::get('/data', [PenjualanPlatformController::class, 'getData'])->name('penjualan-platform.data');
+    Route::get('/create', [PenjualanPlatformController::class, 'create'])->name('penjualan-platform.create');
+    Route::post('/store', [PenjualanPlatformController::class, 'store'])->name('penjualan-platform.store');
+    Route::get('/laporan', [PenjualanPlatformController::class, 'laporan'])->name('penjualan-platform.laporan');
+    Route::get('/laporan/data', [PenjualanPlatformController::class, 'laporanData'])->name('penjualan-platform.laporan.data');
+    Route::get('/{id}/edit', [PenjualanPlatformController::class, 'edit'])->name('penjualan-platform.edit');
+    Route::put('/{id}', [PenjualanPlatformController::class, 'update'])->name('penjualan-platform.update');
+    Route::get('/{id}', [PenjualanPlatformController::class, 'show'])->name('penjualan-platform.show');
+    Route::get('/{id}/print', [PenjualanPlatformController::class, 'print'])->name('penjualan-platform.print');
+    Route::delete('/{id}', [PenjualanPlatformController::class, 'destroy'])->name('penjualan-platform.destroy');
+});
+
+// Akuntansi - Pengeluaran
+Route::prefix('pengeluaran')->group(function () {
+    Route::get('/', [PengeluaranController::class, 'index'])->name('pengeluaran.index');
+    Route::get('/data', [PengeluaranController::class, 'getData'])->name('pengeluaran.data');
+    Route::post('/store', [PengeluaranController::class, 'store'])->name('pengeluaran.store');
+    Route::delete('/{id}', [PengeluaranController::class, 'destroy'])->name('pengeluaran.destroy');
+});
+Route::get('/akuntansi/laporan', [PengeluaranController::class, 'laporan'])->name('akuntansi.laporan');
+Route::get('/akuntansi/laporan/data', [PengeluaranController::class, 'laporanData'])->name('akuntansi.laporan.data');
+
+// Transaksi Motor (Barang + Jasa)
+Route::prefix('transaksi-motor')->group(function () {
+    Route::get('/', [TransaksiMotorController::class, 'index'])->name('transaksi-motor.index');
+    Route::get('/data', [TransaksiMotorController::class, 'getData'])->name('transaksi-motor.data');
+    Route::get('/create', [TransaksiMotorController::class, 'create'])->name('transaksi-motor.create');
+    Route::post('/store', [TransaksiMotorController::class, 'store'])->name('transaksi-motor.store');
+    Route::get('/laporan', [TransaksiMotorController::class, 'laporan'])->name('transaksi-motor.laporan');
+    Route::get('/laporan/data', [TransaksiMotorController::class, 'laporanData'])->name('transaksi-motor.laporan.data');
+    Route::get('/{id}/edit', [TransaksiMotorController::class, 'edit'])->name('transaksi-motor.edit');
+    Route::put('/{id}', [TransaksiMotorController::class, 'update'])->name('transaksi-motor.update');
+    Route::get('/{id}', [TransaksiMotorController::class, 'show'])->name('transaksi-motor.show');
+    Route::get('/{id}/print', [TransaksiMotorController::class, 'print'])->name('transaksi-motor.print');
+    Route::delete('/{id}', [TransaksiMotorController::class, 'destroy'])->name('transaksi-motor.destroy');
+});
 
 Route::get('template/excel', function () {
     return Excel::download(new \App\Exports\BarangTemplateExport(), 'template_barang.xlsx');

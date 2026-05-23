@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"d:\\\\1.PROJECT-GEDEN\" -Filter \"*.sql\" -Recurse -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object FullName)",
+      "PowerShell(\\(Get-Content \"d:\\\\1.PROJECT-GEDEN\\\\armor刢70047_armor.sql\" -Raw\\) -replace 'utf8mb4_uca1400_ai_ci', 'utf8mb4_unicode_ci' | Set-Content \"d:\\\\1.PROJECT-GEDEN\\\\armor刢70047_armor_fixed.sql\" -Encoding utf8)",
+      "PowerShell($src = \"d:\\\\1.PROJECT-GEDEN\\\\armor刢70047_armor.sql\"; $dst = \"d:\\\\1.PROJECT-GEDEN\\\\armor刢70047_armor_fixed.sql\"; \\(Get-Content $src -Raw\\) -replace 'utf8mb4_uca1400_ai_ci', 'utf8mb4_unicode_ci' | Set-Content $dst -Encoding utf8; Write-Host \"Done. Fixed file saved to: $dst\")",
+      "PowerShell($dir = \"d:\\\\1.PROJECT-GEDEN\\\\armor\"; $file = \"u\" + \"522270047_armor.sql\"; $src = Join-Path $dir $file; $dst = Join-Path $dir \\(\"u\" + \"522270047_armor_fixed.sql\"\\); Write-Host \"Source: $src\"; Test-Path $src)",
+      "PowerShell($dir = \"d:\\\\1.PROJECT-GEDEN\\\\armor\"; $src = Join-Path $dir \\(\"u\" + \"522270047_armor.sql\"\\); $dst = Join-Path $dir \\(\"u\" + \"522270047_armor_fixed.sql\"\\); \\(Get-Content $src -Raw\\) -replace 'utf8mb4_uca1400_ai_ci', 'utf8mb4_unicode_ci' | Set-Content $dst -Encoding utf8; $count = \\(Select-String -Path $dst -Pattern 'utf8mb4_unicode_ci'\\).Count; Write-Host \"Done! Replacements found in fixed file: $count\")",
+      "PowerShell(& \"C:\\\\laragon\\\\bin\\\\mysql\\\\mysql-8.0.30-winx64\\\\bin\\\\mysql.exe\" -u root armor -e \"SHOW TABLES;\" 2>&1)",
+      "Bash(Get-ChildItem -Path \"app/Http/Controllers\" -Filter \"*.php\")",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(Sort-Object)"
+    ]
+  }
+}

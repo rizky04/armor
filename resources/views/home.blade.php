@@ -1,93 +1,183 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid py-3">
 
-    {{-- === RINGKASAN UTAMA === --}}
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card text-bg-primary shadow-sm">
+    {{-- TANGGAL HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="fw-bold mb-0">Dashboard</h5>
+            <small class="text-muted">{{ now()->translatedFormat('l, d F Y') }}</small>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-light text-dark border">Bulan {{ now()->translatedFormat('F Y') }}</span>
+        </div>
+    </div>
+
+    {{-- KARTU RINGKASAN HARI INI --}}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #0d6efd!important;">
                 <div class="card-body">
-                    <h6>Total Penjualan Barang</h6>
-                    <h4>Rp {{ number_format($totalSales, 0, ',', '.') }}</h4>
-                    <p class="mb-0 text-white-50">Dibayar: Rp {{ number_format($totalPaidSales, 0, ',', '.') }}</p>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-muted small">Transaksi Motor Hari Ini</div>
+                            <div class="fs-3 fw-bold text-primary">{{ $trxHariIni }}</div>
+                            <div class="small text-muted">transaksi selesai</div>
+                        </div>
+                        <div class="text-primary opacity-50 fs-2"><i class="fa-solid fa-motorcycle"></i></div>
+                    </div>
+                    @if($trxDraft > 0)
+                    <div class="mt-2">
+                        <span class="badge bg-warning text-dark">{{ $trxDraft }} draft pending</span>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card text-bg-success shadow-sm">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #198754!important;">
                 <div class="card-body">
-                    <h6>Total Service</h6>
-                    <h4>Rp {{ number_format($totalService, 0, ',', '.') }}</h4>
-                    <p class="mb-0 text-white-50">Dibayar: Rp {{ number_format($totalPaidService, 0, ',', '.') }}</p>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-muted small">Penjualan Platform Hari Ini</div>
+                            <div class="fs-3 fw-bold text-success">{{ $pjlHariIni }}</div>
+                            <div class="small text-muted">pesanan selesai</div>
+                        </div>
+                        <div class="text-success opacity-50 fs-2"><i class="fa-solid fa-store"></i></div>
+                    </div>
+                    @if($pjlPending > 0)
+                    <div class="mt-2">
+                        <span class="badge bg-warning text-dark">{{ $pjlPending }} pesanan pending</span>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card text-bg-warning shadow-sm">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #dc3545!important;">
                 <div class="card-body">
-                    <h6>Total Keseluruhan</h6>
-                    <h4>Rp {{ number_format($grandTotal, 0, ',', '.') }}</h4>
-                    <p class="mb-0 text-white-50">Sisa: Rp {{ number_format($grandDue, 0, ',', '.') }}</p>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-muted small">Pengeluaran Bulan Ini</div>
+                            <div class="fs-5 fw-bold text-danger">Rp {{ number_format($pengeluaranBulanIni, 0, ',', '.') }}</div>
+                            <div class="small text-muted">total pengeluaran</div>
+                        </div>
+                        <div class="text-danger opacity-50 fs-2"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-left:4px solid {{ $labaBersihBulan >= 0 ? '#20c997' : '#dc3545' }}!important;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="text-muted small">Laba Bersih Bulan Ini</div>
+                            <div class="fs-5 fw-bold {{ $labaBersihBulan >= 0 ? 'text-success' : 'text-danger' }}">
+                                Rp {{ number_format(abs($labaBersihBulan), 0, ',', '.') }}
+                            </div>
+                            <div class="small text-muted">{{ $labaBersihBulan >= 0 ? 'keuntungan' : 'rugi' }}</div>
+                        </div>
+                        <div class="{{ $labaBersihBulan >= 0 ? 'text-success' : 'text-danger' }} opacity-50 fs-2">
+                            <i class="fa-solid fa-{{ $labaBersihBulan >= 0 ? 'chart-line' : 'arrow-trend-down' }}"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- === GRAFIK PENJUALAN DAN SERVICE === --}}
-    <div class="row">
-        <div class="col-md-8 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h6 class="mb-0">Grafik Penjualan & Service Bulanan</h6>
-                </div>
+    {{-- OMZET BULAN INI --}}
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white">
                 <div class="card-body">
-                    <canvas id="monthlyChart" height="120"></canvas>
+                    <div class="small opacity-75 mb-1">Omzet Transaksi Motor</div>
+                    <div class="fs-5 fw-bold">Rp {{ number_format($trxBulanIni, 0, ',', '.') }}</div>
+                    <div class="small opacity-75">Keuntungan: Rp {{ number_format($trxKeuntungan, 0, ',', '.') }}</div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h6 class="mb-0">Status Pembayaran</h6>
-                </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white">
                 <div class="card-body">
-                    <canvas id="statusChart" height="120"></canvas>
+                    <div class="small opacity-75 mb-1">Omzet Penjualan Platform</div>
+                    <div class="fs-5 fw-bold">Rp {{ number_format($pjlBulanIni, 0, ',', '.') }}</div>
+                    <div class="small opacity-75">Laba: Rp {{ number_format($pjlLaba, 0, ',', '.') }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="background:#f8f9fa;">
+                <div class="card-body">
+                    <div class="small text-muted mb-1">Rumus Laba Bersih</div>
+                    <div class="small">
+                        <span class="text-primary fw-semibold">Rp {{ number_format($trxKeuntungan, 0, ',', '.') }}</span>
+                        <span class="text-muted"> + </span>
+                        <span class="text-success fw-semibold">Rp {{ number_format($pjlLaba, 0, ',', '.') }}</span>
+                        <span class="text-muted"> − </span>
+                        <span class="text-danger fw-semibold">Rp {{ number_format($pengeluaranBulanIni, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="fw-bold mt-1 {{ $labaBersihBulan >= 0 ? 'text-success' : 'text-danger' }}">
+                        = Rp {{ number_format($labaBersihBulan, 0, ',', '.') }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- === TOP ITEMS & SERVICES === --}}
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h6 class="mb-0">Top 5 Barang Terlaris</h6>
+    {{-- GRAFIK --}}
+    <div class="row g-3 mb-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="mb-0 fw-bold"><i class="fa-solid fa-chart-bar me-1 text-primary"></i> Omzet & Pengeluaran 6 Bulan Terakhir</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartBulanan" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- TRANSAKSI TERBARU --}}
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold"><i class="fa-solid fa-motorcycle me-1 text-primary"></i> Transaksi Motor Terbaru</h6>
+                    <a href="{{ route('transaksi-motor.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-bordered mb-0">
+                    <table class="table table-hover mb-0 table-sm">
                         <thead class="table-light">
                             <tr>
-                                <th>No</th>
-                                <th>Barang</th>
-                                <th>Qty</th>
-                                <th>Total</th>
+                                <th>No. Transaksi</th>
+                                <th>Customer</th>
+                                <th class="text-end">Total</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($topItems as $i => $item)
-                                <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>{{ $item->barang->nama_barang ?? '-' }}</td>
-                                    <td>{{ $item->total_qty }}</td>
-                                    <td>Rp {{ number_format($item->total_sales, 0, ',', '.') }}</td>
-                                </tr>
+                            @forelse($recentTrx as $trx)
+                            <tr>
+                                <td><small class="text-muted">{{ $trx->nomor_transaksi }}</small></td>
+                                <td>{{ $trx->nama_customer }}</td>
+                                <td class="text-end">Rp {{ number_format($trx->total, 0, ',', '.') }}</td>
+                                <td>
+                                    @if($trx->status === 'selesai')
+                                        <span class="badge bg-success">Selesai</span>
+                                    @else
+                                        <span class="badge bg-warning text-dark">Draft</span>
+                                    @endif
+                                </td>
+                            </tr>
                             @empty
-                                <tr><td colspan="4" class="text-center text-muted">Belum ada data</td></tr>
+                            <tr><td colspan="4" class="text-center text-muted py-3">Belum ada transaksi.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -95,103 +185,43 @@
             </div>
         </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h6 class="mb-0">Top 5 Jasa Terlaris</h6>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold"><i class="fa-solid fa-store me-1 text-success"></i> Penjualan Platform Terbaru</h6>
+                    <a href="{{ route('penjualan-platform.index') }}" class="btn btn-sm btn-outline-success">Lihat Semua</a>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-bordered mb-0">
+                    <table class="table table-hover mb-0 table-sm">
                         <thead class="table-light">
                             <tr>
-                                <th>No</th>
-                                <th>Jasa</th>
-                                <th>Qty</th>
-                                <th>Total</th>
+                                <th>No. Penjualan</th>
+                                <th>Platform</th>
+                                <th class="text-end">Laba</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($topServices as $i => $service)
-                                <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>{{ $service->jasa->nama_jasa ?? '-' }}</td>
-                                    <td>{{ $service->total_qty }}</td>
-                                    <td>Rp {{ number_format($service->total_sales, 0, ',', '.') }}</td>
-                                </tr>
+                            @forelse($recentPjl as $pjl)
+                            <tr>
+                                <td><small class="text-muted">{{ $pjl->nomor_penjualan }}</small></td>
+                                <td>{{ $pjl->platform }}</td>
+                                <td class="text-end {{ $pjl->laba_bersih >= 0 ? 'text-success' : 'text-danger' }} fw-semibold">
+                                    Rp {{ number_format($pjl->laba_bersih, 0, ',', '.') }}
+                                </td>
+                                <td>
+                                    @if($pjl->status === 'selesai')
+                                        <span class="badge bg-success">Selesai</span>
+                                    @elseif($pjl->status === 'pending')
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    @else
+                                        <span class="badge bg-danger">Dibatalkan</span>
+                                    @endif
+                                </td>
+                            </tr>
                             @empty
-                                <tr><td colspan="4" class="text-center text-muted">Belum ada data</td></tr>
+                            <tr><td colspan="4" class="text-center text-muted py-3">Belum ada penjualan.</td></tr>
                             @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- === TRANSAKSI TERBARU === --}}
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h6 class="mb-0">Transaksi Penjualan Terbaru</h6>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th>No. Sales</th>
-                                <th>Tanggal</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($recentSales as $sale)
-                                <tr>
-                                    <td>{{ $sale->nomor_sales }}</td>
-                                    <td>{{ $sale->sales_date }}</td>
-                                    <td>Rp {{ number_format($sale->total, 0, ',', '.') }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $sale->status_bayar == 'lunas' ? 'success' : ($sale->status_bayar == 'cicil' ? 'warning' : 'danger') }}">
-                                            {{ ucfirst($sale->status_bayar) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h6 class="mb-0">Transaksi Service Terbaru</h6>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th>No. Service</th>
-                                <th>Tanggal</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($recentServices as $srv)
-                                <tr>
-                                    <td>{{ $srv->nomor_service }}</td>
-                                    <td>{{ $srv->service_date }}</td>
-                                    <td>Rp {{ number_format($srv->total_cost, 0, ',', '.') }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $srv->status_bayar == 'lunas' ? 'success' : ($srv->status_bayar == 'cicil' ? 'warning' : 'danger') }}">
-                                            {{ ucfirst($srv->status_bayar) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -205,68 +235,55 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // === Data grafik dari Controller ===
-    const salesPerMonth = @json(array_values($salesPerMonth));
-    const servicePerMonth = @json(array_values($servicePerMonth));
+const labels       = @json($chartLabels);
+const dataTrx      = @json($chartTrx);
+const dataPjl      = @json($chartPjl);
+const dataPengeluaran = @json($chartPengeluaran);
 
-    @php
-        // $labels = [];
-        // foreach (range(1, 12) as $m) $labels[] = date('M', mktime(0,0,0,$m,1));
-           $labels = [];
-    $currentMonth = date('n'); // bulan sekarang (1–12)
-    for ($i = 0; $i < 12; $i++) {
-        $monthNumber = (($currentMonth + $i - 1) % 12) + 1;
-        $labels[] = date('M', mktime(0, 0, 0, $monthNumber, 1));
-    }
-    @endphp
-
-    const months = @json($labels);
-    const statusData = @json(array_values($statusCounts));
-    const statusLabels = @json(array_keys($statusCounts));
-
-    // === Grafik Gabungan Penjualan + Service ===
-    const ctx = document.getElementById('monthlyChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: 'Penjualan Barang',
-                    data: salesPerMonth,
-                    borderColor: 'rgba(54, 162, 235, 0.9)',
-                    fill: false,
-                    tension: 0.3
-                },
-                {
-                    label: 'Service',
-                    data: servicePerMonth,
-                    borderColor: 'rgba(75, 192, 192, 0.9)',
-                    fill: false,
-                    tension: 0.3
+new Chart(document.getElementById('chartBulanan'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Omzet Transaksi Motor',
+                data: dataTrx,
+                backgroundColor: 'rgba(13,110,253,0.7)',
+                borderRadius: 4,
+            },
+            {
+                label: 'Penghasilan Platform',
+                data: dataPjl,
+                backgroundColor: 'rgba(25,135,84,0.7)',
+                borderRadius: 4,
+            },
+            {
+                label: 'Pengeluaran',
+                data: dataPengeluaran,
+                backgroundColor: 'rgba(220,53,69,0.6)',
+                borderRadius: 4,
+            },
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ' Rp ' + Number(ctx.raw).toLocaleString('id-ID'),
                 }
-            ]
+            }
         },
-        options: { responsive: true, scales: { y: { beginAtZero: true } } }
-    });
-
-    // === Pie Chart Status Pembayaran ===
-    const ctx2 = document.getElementById('statusChart').getContext('2d');
-    new Chart(ctx2, {
-        type: 'pie',
-        data: {
-            labels: statusLabels,
-            datasets: [{
-                data: statusData,
-                backgroundColor: [
-                    'rgba(75,192,192,0.7)',
-                    'rgba(255,206,86,0.7)',
-                    'rgba(255,99,132,0.7)',
-                    'rgba(153,102,255,0.7)',
-                ]
-            }]
-        },
-        options: { responsive: true }
-    });
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: val => 'Rp ' + Number(val).toLocaleString('id-ID'),
+                }
+            }
+        }
+    }
+});
 </script>
 @endpush

@@ -2,129 +2,89 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Mechanic;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\SalesPayment;
 use App\Models\Service;
 use App\Models\ServiceJob;
 use App\Models\ServicePayment;
-use App\Models\ServiceSparepart;
-use App\Models\Transaction;
+use App\Models\TransaksiMotor;
+use App\Models\TransaksiMotorBarang;
+use App\Models\PenjualanPlatform;
+use App\Models\Pengeluaran;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-     public function index()
+    public function index()
     {
-    //    / === TOTAL PENJUALAN BARANG ===
-    $totalSales = Sales::sum('total');
-    $totalPaidSales = SalesPayment::sum('amount_paid');
+        $bulanIni  = now()->month;
+        $tahunIni  = now()->year;
+        $hariIni   = now()->toDateString();
 
-    // === TOTAL SERVICE ===
-    $totalService = Service::sum('total_cost');
-    $totalPaidService = ServicePayment::sum('amount_paid');
+        // === TRANSAKSI MOTOR ===
+        $trxHariIni    = TransaksiMotor::whereDate('tanggal', $hariIni)->where('status', 'selesai')->count();
+        $trxBulanIni   = TransaksiMotor::whereYear('tanggal', $tahunIni)->whereMonth('tanggal', $bulanIni)->where('status', 'selesai')->sum('total');
+        $trxDraft      = TransaksiMotor::where('status', 'draft')->count();
 
-    // === TOTAL GABUNGAN ===
-    $grandTotal = $totalSales + $totalService;
-    $grandPaid = $totalPaidSales + $totalPaidService;
-    $grandDue = $grandTotal - $grandPaid;
+        // omzet & laba transaksi motor bulan ini
+        $trxBarangs = TransaksiMotorBarang::whereHas('transaksi', function ($q) use ($bulanIni, $tahunIni) {
+            $q->where('status', 'selesai')->whereMonth('tanggal', $bulanIni)->whereYear('tanggal', $tahunIni);
+        })->get();
+        $trxOmzetBarang  = $trxBarangs->sum('subtotal');
+        $trxModalBarang  = $trxBarangs->sum(fn($b) => $b->harga_kulak * $b->qty);
+        $trxUntungBarang = $trxOmzetBarang - $trxModalBarang;
 
-    $todaySalesCount = Sales::whereDate('sales_date', now())->count();
-    $todayServiceCount = Service::whereDate('service_date', now())->count();
+        $trxOmzetJasa = TransaksiMotor::whereYear('tanggal', $tahunIni)->whereMonth('tanggal', $bulanIni)
+            ->where('status', 'selesai')->sum('total_jasa');
+        $trxKeuntungan = $trxUntungBarang + $trxOmzetJasa;
 
-    // === PENJUALAN BULANAN (BARANG) ===
-    $salesPerMonth = Sales::selectRaw('MONTH(sales_date) as month, SUM(total) as total')
-        ->groupBy('month')
-        ->orderBy('month')
-        ->pluck('total', 'month')
-        ->toArray();
+        // === PENJUALAN PLATFORM ===
+        $pjlHariIni  = PenjualanPlatform::whereDate('tanggal', $hariIni)->where('status', 'selesai')->count();
+        $pjlBulanIni = PenjualanPlatform::whereYear('tanggal', $tahunIni)->whereMonth('tanggal', $bulanIni)->where('status', 'selesai')->sum('total_harga_jual');
+        $pjlLaba     = PenjualanPlatform::whereYear('tanggal', $tahunIni)->whereMonth('tanggal', $bulanIni)->where('status', 'selesai')->sum('laba_bersih');
+        $pjlPending  = PenjualanPlatform::where('status', 'pending')->count();
 
-    // === SERVICE BULANAN ===
-    $servicePerMonth = Service::selectRaw('MONTH(service_date) as month, SUM(total_cost) as total')
-        ->groupBy('month')
-        ->orderBy('month')
-        ->pluck('total', 'month')
-        ->toArray();
+        // === PENGELUARAN ===
+        $pengeluaranBulanIni = Pengeluaran::whereYear('tanggal', $tahunIni)->whereMonth('tanggal', $bulanIni)->sum('jumlah');
 
-            // ✅ TAMBAHKAN BAGIAN INI SETELAH QUERY DI ATAS
-    // === ROTASI DATA BULAN SESUAI BULAN BERJALAN ===
-    function rotateDataByCurrentMonth($data) {
-        $currentMonth = now()->month; // Ambil bulan sekarang (1–12)
-        $rotated = [];
-        for ($i = 0; $i < 12; $i++) {
-            $month = (($currentMonth + $i - 1) % 12) + 1; // Geser bulan
-            $rotated[] = $data[$month] ?? 0; // Ambil nilai, default 0 jika kosong
+        // === LABA BERSIH BULAN INI ===
+        $labaBersihBulan = $trxKeuntungan + $pjlLaba - $pengeluaranBulanIni;
+
+        // === GRAFIK 6 BULAN TERAKHIR ===
+        $chartLabels = [];
+        $chartTrx    = [];
+        $chartPjl    = [];
+        $chartPengeluaran = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $bulan = now()->subMonths($i);
+            $chartLabels[]     = $bulan->format('M Y');
+            $chartTrx[]        = (float) TransaksiMotor::whereYear('tanggal', $bulan->year)
+                ->whereMonth('tanggal', $bulan->month)->where('status', 'selesai')->sum('total');
+            $chartPjl[]        = (float) PenjualanPlatform::whereYear('tanggal', $bulan->year)
+                ->whereMonth('tanggal', $bulan->month)->where('status', 'selesai')->sum('penghasilan_bersih');
+            $chartPengeluaran[] = (float) Pengeluaran::whereYear('tanggal', $bulan->year)
+                ->whereMonth('tanggal', $bulan->month)->sum('jumlah');
         }
-        return $rotated;
-    }
 
-    // Terapkan rotasi pada data
-    $salesPerMonth = rotateDataByCurrentMonth($salesPerMonth);
-    $servicePerMonth = rotateDataByCurrentMonth($servicePerMonth);
-    // ✅ SAMPAI SINI
+        // === RECENT ===
+        $recentTrx = TransaksiMotor::with('creator')->latest()->take(6)->get();
+        $recentPjl = PenjualanPlatform::latest()->take(6)->get();
 
-    // === STATUS PEMBAYARAN (GABUNG) ===
-    $statusCounts = [
-        'lunas' => (Sales::where('status_bayar', 'lunas')->count() + Service::where('status_bayar', 'lunas')->count()),
-        'cicil' => (Sales::where('status_bayar', 'cicil')->count() + Service::where('status_bayar', 'cicil')->count()),
-        'belum' => (Sales::where('status_bayar', 'belum')->count() + Service::where('status_bayar', 'belum bayar')->count()),
-        'hutang' => (Sales::where('status_bayar', 'hutang')->count() + Service::where('status_bayar', 'hutang')->count()),
-    ];
-
-    // === ITEM / SERVICE TERLARIS ===
-    $topItems = SalesItem::select('id_barang', DB::raw('SUM(qty) as total_qty'), DB::raw('SUM(subtotal) as total_sales'))
-        ->groupBy('id_barang')
-        ->with('barang')
-        ->orderByDesc('total_qty')
-        ->take(5)
-        ->get();
-
-    $topServices = ServiceJob::select('id_jasa', DB::raw('SUM(qty) as total_qty'), DB::raw('SUM(subtotal) as total_sales'))
-        ->groupBy('id_jasa')
-        ->with('jasa')
-        ->orderByDesc('total_qty')
-        ->take(5)
-        ->get();
-
-    // === DATA RECENT TRANSAKSI ===
-    $recentSales = Sales::latest()->take(5)->get();
-    $recentServices = Service::latest()->take(5)->get();
-
-    return view('home', compact(
-        'totalSales',
-        'totalPaidSales',
-        'totalService',
-        'totalPaidService',
-        'grandTotal',
-        'grandPaid',
-        'grandDue',
-        'todaySalesCount',
-        'todayServiceCount',
-        'salesPerMonth',
-        'servicePerMonth',
-        'statusCounts',
-        'topItems',
-        'topServices',
-        'recentSales',
-        'recentServices'
-    ));
+        return view('home', compact(
+            'trxHariIni', 'trxBulanIni', 'trxDraft', 'trxKeuntungan',
+            'pjlHariIni', 'pjlBulanIni', 'pjlLaba', 'pjlPending',
+            'pengeluaranBulanIni', 'labaBersihBulan',
+            'chartLabels', 'chartTrx', 'chartPjl', 'chartPengeluaran',
+            'recentTrx', 'recentPjl'
+        ));
     }
 }
