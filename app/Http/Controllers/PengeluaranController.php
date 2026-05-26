@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pembelian;
 use App\Models\Pengeluaran;
 use App\Models\PenjualanPlatform;
 use App\Models\TransaksiMotor;
@@ -136,8 +137,15 @@ class PengeluaranController extends Controller
             ->map(fn($g) => $g->sum('jumlah'))
             ->sortDesc();
 
+        // ===== PEMBELIAN BARANG =====
+        $pembelianQuery = Pembelian::with('barang');
+        if ($dari)   $pembelianQuery->whereDate('tgl_pembelian', '>=', $dari);
+        if ($sampai) $pembelianQuery->whereDate('tgl_pembelian', '<=', $sampai);
+        $pembelianData  = $pembelianQuery->orderBy('tgl_pembelian')->get();
+        $totalPembelian = $pembelianData->sum(fn($p) => $p->jumlah_pembelian * $p->harga_kulak);
+
         // ===== LABA BERSIH =====
-        $labaBersih = $totalKeuntungan - $totalPengeluaran;
+        $labaBersih = $totalKeuntungan - $totalPengeluaran - $totalPembelian;
 
         return response()->json([
             'transaksi_motor' => [
@@ -169,6 +177,17 @@ class PengeluaranController extends Controller
                 'total'        => $totalPengeluaran,
                 'per_kategori' => $pengeluaranPerKategori,
                 'detail'       => $pengeluaranData,
+            ],
+            'pembelian_barang' => [
+                'total'  => $totalPembelian,
+                'detail' => $pembelianData->map(fn($p) => [
+                    'tgl_pembelian'   => $p->tgl_pembelian,
+                    'nama_barang'     => $p->barang->nama_barang ?? '-',
+                    'kode_barang'     => $p->barang->kode_barang ?? '-',
+                    'jumlah'          => $p->jumlah_pembelian,
+                    'harga_kulak'     => $p->harga_kulak,
+                    'total'           => $p->jumlah_pembelian * $p->harga_kulak,
+                ]),
             ],
             'laba_bersih' => $labaBersih,
         ]);

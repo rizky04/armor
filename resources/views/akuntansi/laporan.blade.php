@@ -86,7 +86,10 @@
                         <div>
                             <div class="text-muted small mb-1">Total Pengeluaran</div>
                             <div class="fs-5 fw-bold text-danger" id="cPengeluaran">Rp 0</div>
-                            <div class="mt-2 small text-muted">Gaji, listrik, operasional, dll</div>
+                            <div class="mt-2 small">
+                                <div>Operasional: <span class="fw-semibold" id="cPengeluaranOps">Rp 0</span></div>
+                                <div>Pembelian Barang: <span class="fw-semibold" id="cPengeluaranPembelian">Rp 0</span></div>
+                            </div>
                         </div>
                         <i class="fa-solid fa-arrow-trend-down fa-2x text-danger opacity-25 mt-1"></i>
                     </div>
@@ -189,12 +192,47 @@
         </div>
     </div>
 
+    <!-- ===== PEMBELIAN BARANG ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light fw-bold">
+                    <i class="fa-solid fa-cart-shopping me-1 text-warning"></i>
+                    Pembelian Barang (Stok Masuk)
+                    <span class="badge bg-warning text-dark ms-2" id="dPembelianJml">0 item</span>
+                    <span class="float-end fw-bold text-danger" id="dTotalPembelian">Rp 0</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tanggal</th>
+                                    <th>Kode Barang</th>
+                                    <th>Nama Barang</th>
+                                    <th class="text-center">Jumlah</th>
+                                    <th class="text-end">Harga Kulak</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyDetailPembelian">
+                                <tr><td colspan="7" class="text-center text-muted">-</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== RUMUS LABA BERSIH ===== -->
     <div class="card mb-4" id="cardLabaBesar">
         <div class="card-body py-4 text-center">
             <div class="text-muted mb-2 small" id="rumusLabel"></div>
             <div class="display-5 fw-bold" id="labaBersihBesar">Rp 0</div>
             <div class="text-muted small mt-2" id="rumusDetail"></div>
+            <div class="text-muted small mt-1" id="rumusDetailPembelian"></div>
         </div>
     </div>
 
@@ -266,6 +304,7 @@ $('#btnLaporan').on('click', function () {
         const pjl = res.penjualan_platform;
         const gab = res.gabungan;
         const pg  = res.pengeluaran;
+        const pb  = res.pembelian_barang;
         const lb  = res.laba_bersih;
 
         // ===== CARDS =====
@@ -275,7 +314,9 @@ $('#btnLaporan').on('click', function () {
         $('#cModal').text(fmt(gab.total_modal));
         $('#cModalTrx').text(fmt(trx.modal));
         $('#cModalPjl').text(fmt(pjl.modal));
-        $('#cPengeluaran').text(fmt(pg.total));
+        $('#cPengeluaran').text(fmt(pg.total + pb.total));
+        $('#cPengeluaranOps').text(fmt(pg.total));
+        $('#cPengeluaranPembelian').text(fmt(pb.total));
         setLaba(lb);
 
         // ===== TRANSAKSI MOTOR =====
@@ -316,10 +357,33 @@ $('#btnLaporan').on('click', function () {
         $('#dTotalPengeluaran').text(fmt(pg.total));
 
         // ===== LABA BERSIH BESAR =====
-        $('#rumusLabel').text('Keuntungan Kotor − Total Pengeluaran = Laba Bersih');
+        $('#rumusLabel').text('Keuntungan Kotor − Pengeluaran Operasional − Pembelian Barang = Laba Bersih');
         $('#rumusDetail').html(
-            `${fmt(gab.total_keuntungan)} &minus; ${fmt(pg.total)} = <strong>${fmt(lb)}</strong>`
+            `${fmt(gab.total_keuntungan)} &minus; ${fmt(pg.total)} &minus; ${fmt(pb.total)} = <strong>${fmt(lb)}</strong>`
         );
+
+        // ===== DETAIL PEMBELIAN BARANG =====
+        const bodyPb = $('#bodyDetailPembelian');
+        bodyPb.empty();
+        $('#dPembelianJml').text(pb.detail.length + ' item');
+        $('#dTotalPembelian').text(fmt(pb.total));
+        if (!pb.detail.length) {
+            bodyPb.append('<tr><td colspan="7" class="text-center text-muted">Tidak ada pembelian barang.</td></tr>');
+        } else {
+            pb.detail.forEach((item, i) => {
+                bodyPb.append(`
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${item.tgl_pembelian}</td>
+                        <td>${item.kode_barang}</td>
+                        <td>${item.nama_barang}</td>
+                        <td class="text-center">${item.jumlah}</td>
+                        <td class="text-end">${fmt(item.harga_kulak)}</td>
+                        <td class="text-end text-danger fw-semibold">${fmt(item.total)}</td>
+                    </tr>
+                `);
+            });
+        }
 
         // ===== DETAIL PENGELUARAN =====
         const bodyDet = $('#bodyDetailPengeluaran');

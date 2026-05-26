@@ -317,6 +317,8 @@ Route::prefix('pengeluaran')->group(function () {
 });
 Route::get('/akuntansi/laporan', [PengeluaranController::class, 'laporan'])->name('akuntansi.laporan');
 Route::get('/akuntansi/laporan/data', [PengeluaranController::class, 'laporanData'])->name('akuntansi.laporan.data');
+Route::get('/akuntansi/modal-barang', [BarangController::class, 'modalBarang'])->name('akuntansi.modal-barang');
+Route::get('/akuntansi/modal-barang/data', [BarangController::class, 'modalBarangData'])->name('akuntansi.modal-barang.data');
 
 // Transaksi Motor (Barang + Jasa)
 Route::prefix('transaksi-motor')->group(function () {

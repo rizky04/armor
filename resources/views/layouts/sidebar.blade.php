@@ -105,6 +105,12 @@
                                 Laporan Keuangan
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('akuntansi.modal-barang') }}"
+                                class="{{ request()->routeIs('akuntansi.modal-barang') ? 'active' : '' }}">
+                                Modal Barang
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="submenu">

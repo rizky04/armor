@@ -68,6 +68,26 @@
 <div class="card">
     <div class="card-body">
 
+        @can('master-data-barang-harga-jual')
+        {{-- Summary Total Modal --}}
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-warning-subtle">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-muted small mb-1">Total Modal Barang (Stok × Harga Kulak)</div>
+                                <div class="fs-5 fw-bold text-warning" id="summaryTotalModal">Rp 0</div>
+                                <div class="text-muted small" id="summaryJumlahItem">0 jenis barang</div>
+                            </div>
+                            <i class="fa-solid fa-boxes-stacked fa-2x text-warning opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endcan
+
         {{-- Header filter & pencarian --}}
         <div class="row mb-3 align-items-center">
             <div class="col-md-4 mb-2 mb-md-0">
@@ -118,6 +138,7 @@
                         <th>Pagu</th>
                         @can('master-data-barang-harga-jual')
                         <th>Harga Kulak</th>
+                        <th>Modal (Stok×Kulak)</th>
                         @endcan
                         <th>Harga Jual</th>
                          <th>Total Terjual</th> <!-- BARU -->
@@ -212,7 +233,7 @@ function loadBarang(page = 1, search = '', filter = '') {
             if (window.userPermissions.deleteBarang)
                 btnDelete = `<button class="dropdown-item btn-delete" data-id="${b.id_barang}"><i class="fa-solid fa-trash me-2"></i>Delete</button>`;
             if (window.userPermissions.hargaKulak) {
-                hargaKulakbarang = `<td>${formatRupiah(b.harga_kulak ?? 0)}</td>`
+                hargaKulakbarang = `<td>${formatRupiah(b.harga_kulak ?? 0)}</td><td class="fw-semibold text-warning">${formatRupiah(b.modal ?? 0)}</td>`
             }
             rows += `
                 <tr class="${rowClass}">
@@ -248,6 +269,12 @@ function loadBarang(page = 1, search = '', filter = '') {
         $('#barang-table tbody').html(rows);
         $('#jumlah-barang').text(res.total);
         $('#info-jumlah').show();
+
+        // Update summary total modal
+        if (res.total_modal !== undefined) {
+            $('#summaryTotalModal').text(formatRupiah(res.total_modal));
+            $('#summaryJumlahItem').text(res.total + ' jenis barang');
+        }
 
         // pagination tetap sama
         let pagination = '';

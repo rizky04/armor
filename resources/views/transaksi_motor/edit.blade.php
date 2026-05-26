@@ -77,8 +77,26 @@
         <!-- SECTION JASA -->
         <h6 class="fw-bold mb-3 border-bottom pb-2"><i class="fa-solid fa-wrench me-1"></i> Jasa / Pekerjaan</h6>
         <div class="row mb-2">
-            <div class="col-md-12">
-                <select id="jasaSelect" style="width:100%;" placeholder="Cari jasa..."><option></option></select>
+            <div class="col-md-10">
+                <select id="jasaSelect" style="width:100%;" placeholder="Cari dari master jasa..."><option></option></select>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-outline-warning w-100" id="btnToggleManualJasa">
+                    <i class="fa-solid fa-pen me-1"></i> Manual
+                </button>
+            </div>
+        </div>
+        <div class="row mb-2 g-2" id="rowManualJasa" style="display:none;">
+            <div class="col-md-6">
+                <input type="text" id="manualNamaJasa" class="form-control" placeholder="Nama jasa...">
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="manualHargaJasa" class="form-control" placeholder="Harga (Rp)" min="0">
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-warning w-100" id="btnAddManualJasa">
+                    <i class="fa-solid fa-plus me-1"></i> Tambahkan
+                </button>
             </div>
         </div>
 
@@ -225,18 +243,23 @@ $(document).ready(function () {
 
     // ====== TAMBAH BARIS JASA ======
     function tambahJasa(item) {
-        const existing = $(`#tabelJasa tbody tr[data-id="${item.id_jasa ?? item.jasa_id}"]`);
-        if (existing.length) {
+        const isManual = item.is_manual ? '1' : '0';
+        const jasaId   = item.is_manual ? ('manual_' + Date.now()) : (item.id_jasa ?? item.jasa_id);
+        const harga    = parseFloat(item.harga ?? item.harga_jasa);
+        const qty      = item.qty ?? 1;
+
+        const existing = $(`#tabelJasa tbody tr[data-id="${jasaId}"]`);
+        if (!item.is_manual && existing.length) {
             existing.find('.qty-jasa').val(parseInt(existing.find('.qty-jasa').val()) + 1);
             updateJasaRow(existing);
             return;
         }
-        const jasaId = item.id_jasa ?? item.jasa_id;
-        const harga  = parseFloat(item.harga ?? item.harga_jasa);
-        const qty    = item.qty ?? 1;
+
+        const badge = item.is_manual ? ' <span class="badge bg-warning text-dark ms-1">manual</span>' : '';
         const tr = $(`
-            <tr data-id="${jasaId}" data-kode="${item.kode_jasa ?? ''}" data-nama="${item.nama_jasa}" data-harga="${harga}">
-                <td class="text-start">${item.kode_jasa ? item.kode_jasa + ' - ' : ''}${item.nama_jasa}</td>
+            <tr data-id="${jasaId}" data-kode="${item.kode_jasa ?? ''}" data-nama="${item.nama_jasa}"
+                data-harga="${harga}" data-manual="${isManual}">
+                <td class="text-start">${item.kode_jasa ? item.kode_jasa + ' - ' : ''}${item.nama_jasa}${badge}</td>
                 <td>${fmt(harga)}</td>
                 <td><input type="number" value="${qty}" min="1" class="form-control form-control-sm qty-jasa text-center"></td>
                 <td class="sub-jasa" data-val="${harga * qty}">${fmt(harga * qty)}</td>
@@ -246,6 +269,26 @@ $(document).ready(function () {
         $('#tabelJasa tbody').append(tr);
         hitungTotal();
     }
+
+    // ====== JASA MANUAL ======
+    $('#btnToggleManualJasa').on('click', function () {
+        $('#rowManualJasa').toggle();
+        $(this).toggleClass('btn-outline-warning btn-warning');
+    });
+
+    $('#btnAddManualJasa').on('click', function () {
+        const nama  = $('#manualNamaJasa').val().trim();
+        const harga = parseFloat($('#manualHargaJasa').val()) || 0;
+        if (!nama)      return Swal.fire('Perhatian!', 'Nama jasa wajib diisi.', 'warning');
+        if (harga <= 0) return Swal.fire('Perhatian!', 'Harga harus lebih dari 0.', 'warning');
+        tambahJasa({ id_jasa: null, kode_jasa: '', nama_jasa: nama, harga: harga, is_manual: true });
+        $('#manualNamaJasa').val('').focus();
+        $('#manualHargaJasa').val('');
+    });
+
+    $('#manualHargaJasa').on('keypress', function (e) {
+        if (e.which === 13) $('#btnAddManualJasa').trigger('click');
+    });
 
     function updateJasaRow(tr) {
         const harga = parseFloat(tr.data('harga'));
@@ -362,13 +405,15 @@ $(document).ready(function () {
         const jasaItems = [];
         $('#tabelJasa tbody tr[data-id]').each(function () {
             const tr = $(this);
+            const isManual = tr.data('manual') == '1';
             jasaItems.push({
-                id_jasa:   tr.data('id'),
+                id_jasa:   isManual ? null : tr.data('id'),
                 kode_jasa: tr.data('kode'),
                 nama_jasa: tr.data('nama'),
                 harga:     parseFloat(tr.data('harga')),
                 qty:       parseInt(tr.find('.qty-jasa').val()),
                 subtotal:  parseFloat(tr.find('.sub-jasa').data('val')),
+                is_manual: isManual,
             });
         });
         return {

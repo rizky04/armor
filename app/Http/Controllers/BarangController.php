@@ -231,7 +231,8 @@ public function getData(Request $request)
         ->select(
             'tbl_barang.*',
             DB::raw('COALESCE(penjualan.total_terjual, 0) as total_terjual'),
-            DB::raw('COALESCE(penjualan.total_penjualan, 0) as total_penjualan')
+            DB::raw('COALESCE(penjualan.total_penjualan, 0) as total_penjualan'),
+            DB::raw('(tbl_barang.stok_barang * tbl_barang.harga_kulak) as modal')
         );
 
     // 🔍 Pencarian multi-kolom
@@ -282,7 +283,13 @@ public function getData(Request $request)
 
     $barang = $query->paginate(15);
 
-    return response()->json($barang);
+    // Total modal seluruh barang (bukan hanya halaman ini)
+    $totalModal = \App\Models\Barang::sum(DB::raw('stok_barang * harga_kulak'));
+
+    $result = $barang->toArray();
+    $result['total_modal'] = $totalModal;
+
+    return response()->json($result);
 }
 
 
@@ -425,6 +432,55 @@ public function getByCode($code)
     ]);
 }
 
+
+public function modalBarang()
+{
+    return view('akuntansi.modal_barang');
+}
+
+public function modalBarangData(Request $request)
+{
+    $query = Barang::query();
+
+    if ($request->filled('search')) {
+        $search   = trim(preg_replace('/\s+/', ' ', $request->search));
+        $keywords = explode(' ', $search);
+        $query->where(function ($q) use ($keywords) {
+            foreach ($keywords as $word) {
+                $q->where(function ($sub) use ($word) {
+                    $sub->where('kode_barang', 'like', "%{$word}%")
+                        ->orWhere('nama_barang', 'like', "%{$word}%")
+                        ->orWhere('merk_barang', 'like', "%{$word}%")
+                        ->orWhere('jenis', 'like', "%{$word}%");
+                });
+            }
+        });
+    }
+
+    if ($request->filled('jenis')) {
+        $query->where('jenis', $request->jenis);
+    }
+
+    $barangs = (clone $query)
+        ->select('id_barang', 'kode_barang', 'nama_barang', 'merk_barang', 'jenis',
+                 'stok_barang', 'harga_kulak',
+                 DB::raw('stok_barang * harga_kulak as modal'))
+        ->orderByDesc(DB::raw('stok_barang * harga_kulak'))
+        ->paginate(20);
+
+    $totalModalFilter = (clone $query)->sum(DB::raw('stok_barang * harga_kulak'));
+    $totalModalSemua  = Barang::sum(DB::raw('stok_barang * harga_kulak'));
+
+    $jenisList = Barang::whereNotNull('jenis')->where('jenis', '!=', '')
+        ->distinct()->pluck('jenis');
+
+    $result                       = $barangs->toArray();
+    $result['total_modal_filter'] = $totalModalFilter;
+    $result['total_modal_semua']  = $totalModalSemua;
+    $result['jenis_list']         = $jenisList;
+
+    return response()->json($result);
+}
 
 public function getByQR($code)
 {

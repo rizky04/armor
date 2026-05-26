@@ -125,9 +125,24 @@ class TransaksiMotorController extends Controller
             }
 
             foreach ($jasaItems as $item) {
+                $jasaId = $item['id_jasa'];
+
+                if (!empty($item['is_manual'])) {
+                    $jasa = Jasa::firstOrCreate(
+                        ['nama_jasa' => $item['nama_jasa']],
+                        [
+                            'kode_jasa'  => null,
+                            'harga_jasa' => $item['harga'],
+                            'jenis'      => 'manual',
+                            'hapus'      => 0,
+                        ]
+                    );
+                    $jasaId = $jasa->id_jasa;
+                }
+
                 TransaksiMotorJasa::create([
                     'transaksi_motor_id' => $transaksi->id,
-                    'jasa_id'            => $item['id_jasa'],
+                    'jasa_id'            => $jasaId,
                     'kode_jasa'          => $item['kode_jasa'] ?? null,
                     'nama_jasa'          => $item['nama_jasa'],
                     'harga'              => $item['harga'],
@@ -228,9 +243,24 @@ class TransaksiMotorController extends Controller
             }
 
             foreach ($jasaItems as $item) {
+                $jasaId = $item['id_jasa'];
+
+                if (!empty($item['is_manual'])) {
+                    $jasa = Jasa::firstOrCreate(
+                        ['nama_jasa' => $item['nama_jasa']],
+                        [
+                            'kode_jasa'  => null,
+                            'harga_jasa' => $item['harga'],
+                            'jenis'      => 'manual',
+                            'hapus'      => 0,
+                        ]
+                    );
+                    $jasaId = $jasa->id_jasa;
+                }
+
                 TransaksiMotorJasa::create([
                     'transaksi_motor_id' => $transaksi->id,
-                    'jasa_id'            => $item['id_jasa'],
+                    'jasa_id'            => $jasaId,
                     'kode_jasa'          => $item['kode_jasa'] ?? null,
                     'nama_jasa'          => $item['nama_jasa'],
                     'harga'              => $item['harga'],
