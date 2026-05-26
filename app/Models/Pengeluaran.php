@@ -25,6 +25,11 @@ class Pengeluaran extends Model
         'Peralatan',
         'Transportasi',
         'Operasional',
+        'Pembelian Barang',
+        'Hutang',
+        'Sparepart',
+        'Oli',
+        'Biaya Jasa',
         'Lain-lain',
     ];
 
