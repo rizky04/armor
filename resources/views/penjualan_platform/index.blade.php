@@ -64,6 +64,7 @@
                         <th>Platform</th>
                         <th>No. Pesanan</th>
                         <th>Pembeli</th>
+                        <th>Nama Barang</th>
                         <th>Tgl</th>
                         <th class="text-end">Total Jual</th>
                         <th class="text-end">Biaya</th>
@@ -108,7 +109,7 @@ function loadData() {
         tbody.empty();
 
         if (!res.data.length) {
-            tbody.append('<tr><td colspan="12" class="text-center text-muted">Tidak ada data.</td></tr>');
+            tbody.append('<tr><td colspan="13" class="text-center text-muted">Tidak ada data.</td></tr>');
             return;
         }
 
@@ -130,6 +131,7 @@ function loadData() {
                     <td>${badgePlatform}</td>
                     <td><small class="text-muted">${item.nomor_pesanan}</small></td>
                     <td>${item.nama_pembeli}</td>
+                    <td><small>${item.nama_barang_list.join(', ')}</small></td>
                     <td>${item.tanggal}</td>
                     <td class="text-end">${fmt(item.total_harga_jual)}</td>
                     <td class="text-end text-danger"><small>${fmt(totalBiaya)}</small></td>

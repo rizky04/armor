@@ -19,7 +19,7 @@ class PenjualanPlatformController extends Controller
 
     public function getData(Request $request)
     {
-        $query = PenjualanPlatform::with('creator')->latest('tanggal');
+        $query = PenjualanPlatform::with(['creator', 'items'])->latest('tanggal');
 
         if ($request->filled('tanggal_dari'))  $query->whereDate('tanggal', '>=', $request->tanggal_dari);
         if ($request->filled('tanggal_sampai')) $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
@@ -44,6 +44,7 @@ class PenjualanPlatformController extends Controller
             'penghasilan_bersih' => $item->penghasilan_bersih,
             'laba_bersih'      => $item->laba_bersih,
             'status'           => $item->status,
+            'nama_barang_list' => $item->items->pluck('nama_barang')->toArray(),
         ]);
 
         return response()->json(['data' => $data]);
