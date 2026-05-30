@@ -55,43 +55,45 @@
 
         <!-- TABEL BARANG -->
         <div class="card">
-            <div class="card-header fw-bold"><i class="fa-solid fa-box me-1"></i> Barang</div>
-            <div class="card-body p-0">
-                <table class="table table-bordered table-sm mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Barang</th>
-                            <th class="text-end">Kulak</th>
-                            <th class="text-end">Jual</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-end">Modal</th>
-                            <th class="text-end">Subtotal Jual</th>
-                            <th class="text-end text-success">Laba</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($penjualan->items as $i => $item)
-                        <tr>
-                            <td>{{ $i+1 }}</td>
-                            <td>
-                                <div>{{ $item->nama_barang }}</div>
-                                <small class="text-muted">{{ $item->kode_barang }}</small>
-                            </td>
-                            <td class="text-end text-muted">{{ number_format($item->harga_kulak,0,',','.') }}</td>
-                            <td class="text-end">{{ number_format($item->harga_jual,0,',','.') }}</td>
-                            <td class="text-center">{{ $item->qty }}</td>
-                            <td class="text-end text-warning">{{ number_format($item->subtotal_modal,0,',','.') }}</td>
-                            <td class="text-end fw-semibold">{{ number_format($item->subtotal_jual,0,',','.') }}</td>
-                            <td class="text-end fw-bold {{ ($item->subtotal_jual - $item->subtotal_modal) >= 0 ? 'text-success' : 'text-danger' }}">
-                                {{ number_format($item->subtotal_jual - $item->subtotal_modal,0,',','.') }}
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+    <div class="card-header fw-bold"><i class="fa-solid fa-box me-1"></i> Barang</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm mb-0" style="white-space: nowrap;">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th style="min-width: 200px;">Barang</th>
+                        <th class="text-end">Kulak</th>
+                        <th class="text-end">Jual</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-end">Modal</th>
+                        <th class="text-end">Subtotal Jual</th>
+                        <th class="text-end text-success">Laba</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($penjualan->items as $i => $item)
+                    <tr>
+                        <td>{{ $i+1 }}</td>
+                        <td>
+                            <div style="white-space: normal;">{{ $item->nama_barang }}</div>
+                            <small class="text-muted">{{ $item->kode_barang }}</small>
+                        </td>
+                        <td class="text-end text-muted">{{ number_format($item->harga_kulak,0,',','.') }}</td>
+                        <td class="text-end">{{ number_format($item->harga_jual,0,',','.') }}</td>
+                        <td class="text-center">{{ $item->qty }}</td>
+                        <td class="text-end text-warning">{{ number_format($item->subtotal_modal,0,',','.') }}</td>
+                        <td class="text-end fw-semibold">{{ number_format($item->subtotal_jual,0,',','.') }}</td>
+                        <td class="text-end fw-bold {{ ($item->subtotal_jual - $item->subtotal_modal) >= 0 ? 'text-success' : 'text-danger' }}">
+                            {{ number_format($item->subtotal_jual - $item->subtotal_modal,0,',','.') }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
+    </div>
+</div>
     </div>
 
     <!-- RINGKASAN KEUANGAN -->
