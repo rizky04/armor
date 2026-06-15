@@ -201,7 +201,7 @@ $(document).ready(function () {
     $.get("{{ route('select2.barangSemua') }}", function (data) {
         barangData = data.map(item => ({
             id: item.id_barang,
-            text: item.kode_barang + ' - ' + item.nama_barang,
+            text: item.kode_barang + ' - ' + item.nama_barang + ' (' + fmt(item.harga_jual) + ')',
             id_barang: item.id_barang,
             kode_barang: item.kode_barang,
             nama_barang: item.nama_barang,
@@ -319,7 +319,7 @@ $(document).ready(function () {
             processResults: data => ({
                 results: data.map(item => ({
                     id: item.id_jasa,
-                    text: (item.kode_jasa ? item.kode_jasa + ' - ' : '') + item.nama_jasa,
+                    text: (item.kode_jasa ? item.kode_jasa + ' - ' : '') + item.nama_jasa + ' (' + fmt(item.harga_jasa) + ')',
                     id_jasa: item.id_jasa,
                     kode_jasa: item.kode_jasa,
                     nama_jasa: item.nama_jasa,

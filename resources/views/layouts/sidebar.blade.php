@@ -91,7 +91,7 @@
                 </li>
                  <li class="submenu">
                     <a href="javascript:void(0);"><i class="fa-solid fa-motorcycle"></i><span>
-                            Transaksi Service</span> <span class="menu-arrow"></span></a>
+                            Transaksi Showroom</span> <span class="menu-arrow"></span></a>
                     <ul>
                         <li>
                             <a href="{{ route('transaksi-motor.create') }}"
@@ -128,6 +128,18 @@
                             <a href="{{ route('akuntansi.laporan') }}"
                                 class="{{ request()->routeIs('akuntansi.laporan') ? 'active' : '' }}">
                                 Laporan Keuangan
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('penjualan-platform.laporan') }}"
+                                class="{{ request()->routeIs('penjualan-platform.laporan') ? 'active' : '' }}">
+                                Laporan Penjualan Barang
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('transaksi-motor.laporan') }}"
+                                class="{{ request()->routeIs('transaksi-motor.laporan') ? 'active' : '' }}">
+                                Laporan Showroom & Service
                             </a>
                         </li>
                         <li>
