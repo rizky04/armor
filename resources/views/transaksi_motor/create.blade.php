@@ -187,7 +187,7 @@ $(document).ready(function () {
             tb += parseFloat($(this).find('.sub').data('val')) || 0;
         });
         $('#tabelJasa tbody tr[data-id]').each(function () {
-            tj += parseFloat($(this).find('.sub').data('val')) || 0;
+            tj += parseFloat($(this).find('.sub-jasa').data('val')) || 0;
         });
         $('#totalBarang, #grandBarang').text(fmt(tb));
         $('#totalJasa, #grandJasa').text(fmt(tj));
