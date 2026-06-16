@@ -184,10 +184,14 @@ $(document).ready(function () {
     function hitungTotal() {
         let tb = 0, tj = 0;
         $('#tabelBarang tbody tr[data-id]').each(function () {
-            tb += parseFloat($(this).find('.sub').data('val')) || 0;
+            const harga = parseFloat($(this).attr('data-harga')) || 0;
+            const qty   = parseInt($(this).find('.qty').val()) || 0;
+            tb += harga * qty;
         });
         $('#tabelJasa tbody tr[data-id]').each(function () {
-            tj += parseFloat($(this).find('.sub-jasa').data('val')) || 0;
+            const harga = parseFloat($(this).attr('data-harga')) || 0;
+            const qty   = parseInt($(this).find('.qty-jasa').val()) || 0;
+            tj += harga * qty;
         });
         $('#totalBarang, #grandBarang').text(fmt(tb));
         $('#totalJasa, #grandJasa').text(fmt(tj));
@@ -261,9 +265,9 @@ $(document).ready(function () {
     });
 
     function updateBarangRow(tr) {
-        const harga = parseFloat(tr.data('harga'));
+        const harga = parseFloat(tr.attr('data-harga')) || 0;
         const qty   = parseInt(tr.find('.qty').val()) || 1;
-        const stok  = parseInt(tr.data('stok'));
+        const stok  = parseInt(tr.attr('data-stok'));
 
         if (qty > stok) {
             Swal.fire('Stok tidak cukup!', `Stok tersedia: ${stok}`, 'warning');
@@ -393,7 +397,7 @@ $(document).ready(function () {
     });
 
     function updateJasaRow(tr) {
-        const harga = parseFloat(tr.data('harga'));
+        const harga = parseFloat(tr.attr('data-harga')) || 0;
         const qty   = parseInt(tr.find('.qty-jasa').val()) || 1;
         const sub   = harga * qty;
         tr.find('.sub-jasa').data('val', sub).text(fmt(sub));
@@ -412,29 +416,33 @@ $(document).ready(function () {
     function collectData(status) {
         const barangItems = [];
         $('#tabelBarang tbody tr[data-id]').each(function () {
-            const tr = $(this);
+            const tr    = $(this);
+            const harga = parseFloat(tr.attr('data-harga')) || 0;
+            const qty   = parseInt(tr.find('.qty').val()) || 0;
             barangItems.push({
-                id_barang:   tr.data('id'),
-                kode_barang: tr.data('kode'),
-                nama_barang: tr.data('nama'),
-                harga:       parseFloat(tr.data('harga')),
-                harga_kulak: parseFloat(tr.data('harga-kulak')) || 0,
-                qty:         parseInt(tr.find('.qty').val()),
-                subtotal:    parseFloat(tr.find('.sub').data('val')),
+                id_barang:   tr.attr('data-id'),
+                kode_barang: tr.attr('data-kode'),
+                nama_barang: tr.attr('data-nama'),
+                harga:       harga,
+                harga_kulak: parseFloat(tr.attr('data-harga-kulak')) || 0,
+                qty:         qty,
+                subtotal:    harga * qty,
             });
         });
 
         const jasaItems = [];
         $('#tabelJasa tbody tr[data-id]').each(function () {
-            const tr = $(this);
-            const isManual = tr.data('manual') == '1';
+            const tr       = $(this);
+            const isManual = tr.attr('data-manual') == '1';
+            const harga    = parseFloat(tr.attr('data-harga')) || 0;
+            const qty      = parseInt(tr.find('.qty-jasa').val()) || 0;
             jasaItems.push({
-                id_jasa:   isManual ? null : tr.data('id'),
-                kode_jasa: tr.data('kode'),
-                nama_jasa: tr.data('nama'),
-                harga:     parseFloat(tr.data('harga')),
-                qty:       parseInt(tr.find('.qty-jasa').val()),
-                subtotal:  parseFloat(tr.find('.sub-jasa').data('val')),
+                id_jasa:   isManual ? null : tr.attr('data-id'),
+                kode_jasa: tr.attr('data-kode'),
+                nama_jasa: tr.attr('data-nama'),
+                harga:     harga,
+                qty:       qty,
+                subtotal:  harga * qty,
                 is_manual: isManual,
             });
         });
