@@ -184,10 +184,14 @@ $(document).ready(function () {
     function hitungTotal() {
         let tb = 0, tj = 0;
         $('#tabelBarang tbody tr[data-id]').each(function () {
-            tb += parseFloat($(this).find('.sub').data('val')) || 0;
+            const harga = parseFloat($(this).attr('data-harga')) || 0;
+            const qty   = parseInt($(this).find('.qty').val()) || 0;
+            tb += harga * qty;
         });
         $('#tabelJasa tbody tr[data-id]').each(function () {
-            tj += parseFloat($(this).find('.sub').data('val')) || 0;
+            const harga = parseFloat($(this).attr('data-harga')) || 0;
+            const qty   = parseInt($(this).find('.qty-jasa').val()) || 0;
+            tj += harga * qty;
         });
         $('#totalBarang, #grandBarang').text(fmt(tb));
         $('#totalJasa, #grandJasa').text(fmt(tj));
@@ -205,15 +209,19 @@ $(document).ready(function () {
             updateBarangRow(existing);
             return;
         }
+        const harga = parseFloat(item.harga) || 0;
+        const qty   = parseInt(item.qty) > 0 ? parseInt(item.qty) : 1;
+        const stok  = parseInt(item.stok);
+        const maxQty = Number.isFinite(stok) ? Math.max(stok, qty) : qty;
         const tr = $(`
             <tr data-id="${item.id_barang}" data-kode="${item.kode_barang ?? ''}"
-                data-nama="${item.nama_barang}" data-harga="${item.harga}"
+                data-nama="${item.nama_barang}" data-harga="${harga}"
                 data-harga-kulak="${item.harga_kulak ?? 0}" data-stok="${item.stok}">
                 <td class="text-start">${item.kode_barang ?? ''} ${item.kode_barang ? '-' : ''} ${item.nama_barang}</td>
-                <td>${fmt(item.harga)}</td>
+                <td>${fmt(harga)}</td>
                 <td>${item.stok}</td>
-                <td><input type="number" value="${item.qty ?? 1}" min="1" max="${item.stok}" class="form-control form-control-sm qty text-center"></td>
-                <td class="sub" data-val="${(item.harga) * (item.qty ?? 1)}">${fmt((item.harga) * (item.qty ?? 1))}</td>
+                <td><input type="number" value="${qty}" min="1" max="${maxQty}" class="form-control form-control-sm qty text-center"></td>
+                <td class="sub" data-val="${harga * qty}">${fmt(harga * qty)}</td>
                 <td><button type="button" class="btn btn-sm btn-danger del-barang"><i class="fa-solid fa-trash"></i></button></td>
             </tr>
         `);
@@ -222,9 +230,9 @@ $(document).ready(function () {
     }
 
     function updateBarangRow(tr) {
-        const harga = parseFloat(tr.data('harga'));
+        const harga = parseFloat(tr.attr('data-harga')) || 0;
         const qty   = parseInt(tr.find('.qty').val()) || 1;
-        const stok  = parseInt(tr.data('stok'));
+        const stok  = parseInt(tr.attr('data-stok'));
         if (qty > stok) {
             Swal.fire('Stok tidak cukup!', `Stok: ${stok}`, 'warning');
             tr.find('.qty').val(stok);
@@ -243,13 +251,16 @@ $(document).ready(function () {
 
     // ====== TAMBAH BARIS JASA ======
     function tambahJasa(item) {
-        const isManual = item.is_manual ? '1' : '0';
-        const jasaId   = item.is_manual ? ('manual_' + Date.now()) : (item.id_jasa ?? item.jasa_id);
-        const harga    = parseFloat(item.harga ?? item.harga_jasa);
-        const qty      = item.qty ?? 1;
+        // Manual bila ditandai is_manual, atau data lama tanpa id jasa (jasa_id kosong)
+        const jasaRefId = item.id_jasa ?? item.jasa_id ?? null;
+        const isManualBool = item.is_manual ? true : (jasaRefId == null);
+        const isManual = isManualBool ? '1' : '0';
+        const jasaId   = isManualBool ? ('manual_' + Date.now() + '_' + Math.floor(Math.random() * 1000)) : jasaRefId;
+        const harga    = parseFloat(item.harga ?? item.harga_jasa) || 0;
+        const qty      = parseInt(item.qty) > 0 ? parseInt(item.qty) : 1;
 
         const existing = $(`#tabelJasa tbody tr[data-id="${jasaId}"]`);
-        if (!item.is_manual && existing.length) {
+        if (!isManualBool && existing.length) {
             existing.find('.qty-jasa').val(parseInt(existing.find('.qty-jasa').val()) + 1);
             updateJasaRow(existing);
             return;
@@ -291,7 +302,7 @@ $(document).ready(function () {
     });
 
     function updateJasaRow(tr) {
-        const harga = parseFloat(tr.data('harga'));
+        const harga = parseFloat(tr.attr('data-harga')) || 0;
         const qty   = parseInt(tr.find('.qty-jasa').val()) || 1;
         const sub   = harga * qty;
         tr.find('.sub-jasa').data('val', sub).text(fmt(sub));
@@ -391,28 +402,32 @@ $(document).ready(function () {
     function collectPayload(status) {
         const barangItems = [];
         $('#tabelBarang tbody tr[data-id]').each(function () {
-            const tr = $(this);
+            const tr    = $(this);
+            const harga = parseFloat(tr.attr('data-harga')) || 0;
+            const qty   = parseInt(tr.find('.qty').val()) || 0;
             barangItems.push({
-                id_barang:   tr.data('id'),
-                kode_barang: tr.data('kode'),
-                nama_barang: tr.data('nama'),
-                harga:       parseFloat(tr.data('harga')),
-                harga_kulak: parseFloat(tr.data('harga-kulak')) || 0,
-                qty:         parseInt(tr.find('.qty').val()),
-                subtotal:    parseFloat(tr.find('.sub').data('val')),
+                id_barang:   tr.attr('data-id'),
+                kode_barang: tr.attr('data-kode'),
+                nama_barang: tr.attr('data-nama'),
+                harga:       harga,
+                harga_kulak: parseFloat(tr.attr('data-harga-kulak')) || 0,
+                qty:         qty,
+                subtotal:    harga * qty,
             });
         });
         const jasaItems = [];
         $('#tabelJasa tbody tr[data-id]').each(function () {
-            const tr = $(this);
-            const isManual = tr.data('manual') == '1';
+            const tr       = $(this);
+            const isManual = tr.attr('data-manual') == '1';
+            const harga    = parseFloat(tr.attr('data-harga')) || 0;
+            const qty      = parseInt(tr.find('.qty-jasa').val()) || 0;
             jasaItems.push({
-                id_jasa:   isManual ? null : tr.data('id'),
-                kode_jasa: tr.data('kode'),
-                nama_jasa: tr.data('nama'),
-                harga:     parseFloat(tr.data('harga')),
-                qty:       parseInt(tr.find('.qty-jasa').val()),
-                subtotal:  parseFloat(tr.find('.sub-jasa').data('val')),
+                id_jasa:   isManual ? null : tr.attr('data-id'),
+                kode_jasa: tr.attr('data-kode'),
+                nama_jasa: tr.attr('data-nama'),
+                harga:     harga,
+                qty:       qty,
+                subtotal:  harga * qty,
                 is_manual: isManual,
             });
         });
