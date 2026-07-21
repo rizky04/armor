@@ -89,6 +89,9 @@ class TransaksiMotorController extends Controller
                 $totalJasa += (float)$item['subtotal'];
             }
 
+            $status = $request->status ?? 'selesai';
+            $reduce = $status !== 'dibatalkan'; // draft & selesai memotong stok
+
             $transaksi = TransaksiMotor::create([
                 'nomor_transaksi' => TransaksiMotor::generateNomor(),
                 'nama_customer'   => $request->nama_customer,
@@ -97,7 +100,8 @@ class TransaksiMotorController extends Controller
                 'nama_motor'      => $request->nama_motor,
                 'tanggal'         => $request->tanggal,
                 'catatan'         => $request->catatan,
-                'status'             => $request->status ?? 'selesai',
+                'status'             => $status,
+                'stok_dipotong'      => $reduce,
                 'metode_pembayaran'  => $request->metode_pembayaran ?? 'cash',
                 'total_barang'    => $totalBarang,
                 'total_jasa'      => $totalJasa,
@@ -117,9 +121,10 @@ class TransaksiMotorController extends Controller
                     'subtotal'           => $item['subtotal'],
                 ]);
 
-                // Potong stok untuk semua status (draft & selesai) — stok direservasi sejak transaksi dibuat
-                Barang::where('id_barang', $item['id_barang'])
-                      ->decrement('stok_barang', $item['qty']);
+                if ($reduce) {
+                    Barang::where('id_barang', $item['id_barang'])
+                          ->decrement('stok_barang', $item['qty']);
+                }
             }
 
             foreach ($jasaItems as $item) {
@@ -191,9 +196,11 @@ class TransaksiMotorController extends Controller
 
         DB::beginTransaction();
         try {
-            // Kembalikan stok lama dulu (sudah dipotong saat transaksi dibuat), lalu dipotong ulang di bawah
-            foreach ($transaksi->barangs as $old) {
-                Barang::where('id_barang', $old->barang_id)->increment('stok_barang', $old->qty);
+            // Kembalikan stok lama HANYA jika transaksi ini memang sudah pernah memotong stok
+            if ($transaksi->stok_dipotong) {
+                foreach ($transaksi->barangs as $old) {
+                    Barang::where('id_barang', $old->barang_id)->increment('stok_barang', $old->qty);
+                }
             }
             $transaksi->barangs()->delete();
             $transaksi->jasas()->delete();
@@ -209,6 +216,7 @@ class TransaksiMotorController extends Controller
             }
 
             $newStatus = $request->status ?? 'draft';
+            $reduce    = $newStatus !== 'dibatalkan'; // draft & selesai memotong stok
 
             $transaksi->update([
                 'nama_customer'    => $request->nama_customer,
@@ -218,6 +226,7 @@ class TransaksiMotorController extends Controller
                 'tanggal'          => $request->tanggal,
                 'catatan'          => $request->catatan,
                 'status'           => $newStatus,
+                'stok_dipotong'    => $reduce,
                 'metode_pembayaran'=> $request->metode_pembayaran ?? 'cash',
                 'total_barang'     => $totalBarang,
                 'total_jasa'       => $totalJasa,
@@ -236,9 +245,10 @@ class TransaksiMotorController extends Controller
                     'subtotal'           => $item['subtotal'],
                 ]);
 
-                // Potong stok untuk semua status (draft & selesai)
-                Barang::where('id_barang', $item['id_barang'])
-                      ->decrement('stok_barang', $item['qty']);
+                if ($reduce) {
+                    Barang::where('id_barang', $item['id_barang'])
+                          ->decrement('stok_barang', $item['qty']);
+                }
             }
 
             foreach ($jasaItems as $item) {
@@ -288,10 +298,12 @@ class TransaksiMotorController extends Controller
 
         DB::beginTransaction();
         try {
-            // Kembalikan stok (dipotong untuk semua status draft & selesai)
-            foreach ($transaksi->barangs as $item) {
-                Barang::where('id_barang', $item->barang_id)
-                      ->increment('stok_barang', $item->qty);
+            // Kembalikan stok hanya jika transaksi ini memang sudah memotong stok
+            if ($transaksi->stok_dipotong) {
+                foreach ($transaksi->barangs as $item) {
+                    Barang::where('id_barang', $item->barang_id)
+                          ->increment('stok_barang', $item->qty);
+                }
             }
             $transaksi->delete();
             DB::commit();

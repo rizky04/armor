@@ -86,6 +86,9 @@ class PenjualanPlatformController extends Controller
             $penghasilanBersih = $totalJual - $totalBiaya;
             $labaBersih        = $penghasilanBersih - $totalModal;
 
+            $status = $request->status ?? 'selesai';
+            $reduce = $status !== 'dibatalkan'; // pending & selesai memotong stok
+
             $penjualan = PenjualanPlatform::create([
                 'nomor_penjualan'  => PenjualanPlatform::generateNomor(),
                 'platform'         => $request->platform,
@@ -100,7 +103,8 @@ class PenjualanPlatformController extends Controller
                 'biaya_lainnya'    => $biayaLainnya,
                 'penghasilan_bersih' => $penghasilanBersih,
                 'laba_bersih'      => $labaBersih,
-                'status'           => $request->status ?? 'selesai',
+                'status'           => $status,
+                'stok_dipotong'    => $reduce,
                 'created_by'       => Auth::id(),
             ]);
 
@@ -117,8 +121,7 @@ class PenjualanPlatformController extends Controller
                     'subtotal_jual'  => $item['subtotal_jual'],
                 ]);
 
-                // Potong stok untuk semua status kecuali dibatalkan (pending & selesai memotong stok)
-                if (($request->status ?? 'selesai') !== 'dibatalkan') {
+                if ($reduce) {
                     Barang::where('id_barang', $item['id_barang'])
                           ->decrement('stok_barang', $item['qty']);
                 }
@@ -165,8 +168,8 @@ class PenjualanPlatformController extends Controller
 
         DB::beginTransaction();
         try {
-            // Kembalikan stok lama dulu (jika sebelumnya dipotong), lalu dipotong ulang sesuai status baru
-            if ($penjualan->status !== 'dibatalkan') {
+            // Kembalikan stok lama HANYA jika transaksi ini memang sudah pernah memotong stok
+            if ($penjualan->stok_dipotong) {
                 foreach ($penjualan->items as $old) {
                     Barang::where('id_barang', $old->barang_id)->increment('stok_barang', $old->qty);
                 }
@@ -190,6 +193,7 @@ class PenjualanPlatformController extends Controller
             $labaBersih        = $penghasilanBersih - $totalModal;
 
             $newStatus = $request->status ?? 'pending';
+            $reduce    = $newStatus !== 'dibatalkan'; // pending & selesai memotong stok
 
             $penjualan->update([
                 'platform'           => $request->platform,
@@ -205,6 +209,7 @@ class PenjualanPlatformController extends Controller
                 'penghasilan_bersih' => $penghasilanBersih,
                 'laba_bersih'        => $labaBersih,
                 'status'             => $newStatus,
+                'stok_dipotong'      => $reduce,
             ]);
 
             foreach ($items as $item) {
@@ -220,7 +225,7 @@ class PenjualanPlatformController extends Controller
                     'subtotal_jual'  => $item['subtotal_jual'],
                 ]);
 
-                if ($newStatus !== 'dibatalkan') {
+                if ($reduce) {
                     Barang::where('id_barang', $item['id_barang'])
                           ->decrement('stok_barang', $item['qty']);
                 }
@@ -246,7 +251,7 @@ class PenjualanPlatformController extends Controller
 
         DB::beginTransaction();
         try {
-            if ($penjualan->status !== 'dibatalkan') {
+            if ($penjualan->stok_dipotong) {
                 foreach ($penjualan->items as $item) {
                     Barang::where('id_barang', $item->barang_id)
                           ->increment('stok_barang', $item->qty);

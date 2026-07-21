@@ -15,7 +15,7 @@ class PenjualanPlatform extends Model
         'total_harga_jual', 'total_modal',
         'biaya_admin', 'biaya_pengiriman', 'biaya_lainnya',
         'penghasilan_bersih', 'laba_bersih',
-        'status', 'created_by',
+        'status', 'stok_dipotong', 'created_by',
     ];
 
     public static $platformList = ['Shopee', 'Tokopedia', 'Lazada', 'TikTok Shop', 'Instagram', 'Offline', 'Lainnya'];

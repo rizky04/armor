@@ -18,6 +18,7 @@ class TransaksiMotor extends Model
         'tanggal',
         'catatan',
         'status',
+        'stok_dipotong',
         'metode_pembayaran',
         'total_barang',
         'total_jasa',
