@@ -212,7 +212,29 @@ public function getData(Request $request)
     )
     ->groupBy('id_barang');
 
-    $combined = $salesData->unionAll($serviceData);
+    // Penjualan via platform (pending & selesai memotong stok, kecuali dibatalkan)
+    $platformData = DB::table('penjualan_platform_item as ppi')
+        ->join('penjualan_platform as pp', 'pp.id', '=', 'ppi.penjualan_platform_id')
+        ->where('pp.status', '!=', 'dibatalkan')
+        ->select(
+            'ppi.barang_id as id_barang',
+            DB::raw('SUM(ppi.qty) as total_terjual'),
+            DB::raw('SUM(ppi.subtotal_jual) as total_penjualan')
+        )
+        ->groupBy('ppi.barang_id');
+
+    // Transaksi motor/service (draft & selesai memotong stok)
+    $motorData = DB::table('transaksi_motor_barang as tmb')
+        ->join('transaksi_motor as tm', 'tm.id', '=', 'tmb.transaksi_motor_id')
+        ->where('tm.status', '!=', 'dibatalkan')
+        ->select(
+            'tmb.barang_id as id_barang',
+            DB::raw('SUM(tmb.qty) as total_terjual'),
+            DB::raw('SUM(tmb.subtotal) as total_penjualan')
+        )
+        ->groupBy('tmb.barang_id');
+
+    $combined = $salesData->unionAll($serviceData)->unionAll($platformData)->unionAll($motorData);
 
     $penjualan = DB::table(DB::raw("({$combined->toSql()}) as combined"))
         ->mergeBindings($combined->getQuery())
