@@ -117,11 +117,9 @@ class TransaksiMotorController extends Controller
                     'subtotal'           => $item['subtotal'],
                 ]);
 
-                // Potong stok barang jika status selesai
-                if ($transaksi->status === 'selesai') {
-                    Barang::where('id_barang', $item['id_barang'])
-                          ->decrement('stok_barang', $item['qty']);
-                }
+                // Potong stok untuk semua status (draft & selesai) — stok direservasi sejak transaksi dibuat
+                Barang::where('id_barang', $item['id_barang'])
+                      ->decrement('stok_barang', $item['qty']);
             }
 
             foreach ($jasaItems as $item) {
@@ -193,7 +191,10 @@ class TransaksiMotorController extends Controller
 
         DB::beginTransaction();
         try {
-            // Hapus detail lama (stok tidak perlu dikembalikan karena masih draft)
+            // Kembalikan stok lama dulu (sudah dipotong saat transaksi dibuat), lalu dipotong ulang di bawah
+            foreach ($transaksi->barangs as $old) {
+                Barang::where('id_barang', $old->barang_id)->increment('stok_barang', $old->qty);
+            }
             $transaksi->barangs()->delete();
             $transaksi->jasas()->delete();
 
@@ -235,11 +236,9 @@ class TransaksiMotorController extends Controller
                     'subtotal'           => $item['subtotal'],
                 ]);
 
-                // Potong stok hanya jika diselesaikan
-                if ($newStatus === 'selesai') {
-                    Barang::where('id_barang', $item['id_barang'])
-                          ->decrement('stok_barang', $item['qty']);
-                }
+                // Potong stok untuk semua status (draft & selesai)
+                Barang::where('id_barang', $item['id_barang'])
+                      ->decrement('stok_barang', $item['qty']);
             }
 
             foreach ($jasaItems as $item) {
@@ -289,12 +288,10 @@ class TransaksiMotorController extends Controller
 
         DB::beginTransaction();
         try {
-            // Kembalikan stok jika status selesai
-            if ($transaksi->status === 'selesai') {
-                foreach ($transaksi->barangs as $item) {
-                    Barang::where('id_barang', $item->barang_id)
-                          ->increment('stok_barang', $item->qty);
-                }
+            // Kembalikan stok (dipotong untuk semua status draft & selesai)
+            foreach ($transaksi->barangs as $item) {
+                Barang::where('id_barang', $item->barang_id)
+                      ->increment('stok_barang', $item->qty);
             }
             $transaksi->delete();
             DB::commit();

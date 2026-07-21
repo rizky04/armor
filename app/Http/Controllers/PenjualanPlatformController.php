@@ -117,8 +117,8 @@ class PenjualanPlatformController extends Controller
                     'subtotal_jual'  => $item['subtotal_jual'],
                 ]);
 
-                // Potong stok barang
-                if (($request->status ?? 'selesai') === 'selesai') {
+                // Potong stok untuk semua status kecuali dibatalkan (pending & selesai memotong stok)
+                if (($request->status ?? 'selesai') !== 'dibatalkan') {
                     Barang::where('id_barang', $item['id_barang'])
                           ->decrement('stok_barang', $item['qty']);
                 }
@@ -165,6 +165,12 @@ class PenjualanPlatformController extends Controller
 
         DB::beginTransaction();
         try {
+            // Kembalikan stok lama dulu (jika sebelumnya dipotong), lalu dipotong ulang sesuai status baru
+            if ($penjualan->status !== 'dibatalkan') {
+                foreach ($penjualan->items as $old) {
+                    Barang::where('id_barang', $old->barang_id)->increment('stok_barang', $old->qty);
+                }
+            }
             $penjualan->items()->delete();
 
             $totalJual  = 0;
@@ -214,7 +220,7 @@ class PenjualanPlatformController extends Controller
                     'subtotal_jual'  => $item['subtotal_jual'],
                 ]);
 
-                if ($newStatus === 'selesai') {
+                if ($newStatus !== 'dibatalkan') {
                     Barang::where('id_barang', $item['id_barang'])
                           ->decrement('stok_barang', $item['qty']);
                 }
@@ -240,7 +246,7 @@ class PenjualanPlatformController extends Controller
 
         DB::beginTransaction();
         try {
-            if ($penjualan->status === 'selesai') {
+            if ($penjualan->status !== 'dibatalkan') {
                 foreach ($penjualan->items as $item) {
                     Barang::where('id_barang', $item->barang_id)
                           ->increment('stok_barang', $item->qty);
