@@ -257,14 +257,18 @@ $(document).ready(function() {
             return;
         }
 
-        const qty      = existingQty  || 1;
+        const qty      = parseInt(existingQty) > 0 ? parseInt(existingQty) : 1;
         const hargaJual  = existingHargaJual || item.harga_jual || 0;
         const hargaKulak = item.harga_kulak || 0;
+        // Stok saat ini sudah terpotong oleh qty transaksi ini sendiri (jika stok_dipotong),
+        // jadi batas maksimal edit = stok sisa + qty yang sudah direservasi transaksi ini.
+        const stokSisa = parseInt(item.stok);
+        const maxQty   = Number.isFinite(stokSisa) ? Math.max(stokSisa, qty) : qty;
 
         const tr = $(`
             <tr data-id="${item.id_barang}" data-kode="${item.kode_barang ?? ''}"
                 data-nama="${item.nama_barang}" data-kulak="${hargaKulak}"
-                data-stok="${item.stok}" data-subtotal-modal="0" data-subtotal-jual="0">
+                data-stok="${maxQty}" data-subtotal-modal="0" data-subtotal-jual="0">
                 <td class="text-start">
                     <div class="fw-semibold">${item.nama_barang}</div>
                     <small class="text-muted">${item.kode_barang ?? ''}</small>
@@ -274,10 +278,10 @@ $(document).ready(function() {
                     <input type="number" class="form-control form-control-sm harga-jual text-end"
                            value="${hargaJual}" min="0" style="width:110px">
                 </td>
-                <td class="text-center">${item.stok}</td>
+                <td class="text-center">${stokSisa}</td>
                 <td>
                     <input type="number" class="form-control form-control-sm qty text-center"
-                           value="${qty}" min="1" max="${item.stok}" style="width:70px">
+                           value="${qty}" min="1" max="${maxQty}" style="width:70px">
                 </td>
                 <td class="text-end sub-modal text-warning">Rp 0</td>
                 <td class="text-end sub-jual text-primary fw-semibold">Rp 0</td>
