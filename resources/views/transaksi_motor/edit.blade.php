@@ -328,7 +328,7 @@ $(document).ready(function () {
     let barangData = [];
     $.get("{{ route('select2.barangSemua') }}", function (data) {
         barangData = data.map(item => ({
-            id: item.id_barang, text: item.kode_barang + ' - ' + item.nama_barang,
+            id: item.id_barang, text: item.kode_barang + ' - ' + item.nama_barang + ' (' + fmt(item.harga_jual) + ')',
             id_barang: item.id_barang, kode_barang: item.kode_barang,
             nama_barang: item.nama_barang, harga: item.harga_jual,
             harga_kulak: item.harga_kulak ?? 0, stok: item.stok_barang ?? 0,
@@ -389,7 +389,7 @@ $(document).ready(function () {
             data: params => ({ q: params.term }),
             processResults: data => ({
                 results: data.map(item => ({
-                    id: item.id_jasa, text: (item.kode_jasa ? item.kode_jasa + ' - ' : '') + item.nama_jasa,
+                    id: item.id_jasa, text: (item.kode_jasa ? item.kode_jasa + ' - ' : '') + item.nama_jasa + ' (' + fmt(item.harga_jasa) + ')',
                     id_jasa: item.id_jasa, kode_jasa: item.kode_jasa,
                     nama_jasa: item.nama_jasa, harga: item.harga_jasa,
                 }))
