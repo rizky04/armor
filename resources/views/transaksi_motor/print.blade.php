@@ -142,6 +142,12 @@
                         <td>Total Jasa</td>
                         <td class="text-right">{{ number_format($transaksi->total_jasa, 0, ',', '.') }}</td>
                     </tr>
+                    @if($transaksi->diskon > 0)
+                    <tr>
+                        <td>Diskon</td>
+                        <td class="text-right">- {{ number_format($transaksi->diskon, 0, ',', '.') }}</td>
+                    </tr>
+                    @endif
                     <tr style="border-top:1px solid #000;">
                         <td><strong>TOTAL</strong></td>
                         <td class="text-right"><strong>{{ number_format($transaksi->total, 0, ',', '.') }}</strong></td>

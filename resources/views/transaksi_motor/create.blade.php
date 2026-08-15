@@ -129,11 +129,15 @@
             </table>
         </div>
 
-        <!-- GRAND TOTAL -->
+        <!-- DISKON & GRAND TOTAL -->
         <div class="d-flex justify-content-end mb-3">
-            <div class="text-end">
+            <div class="text-end" style="min-width:320px;">
                 <div class="fs-5">Total Barang: <strong id="grandBarang">Rp 0</strong></div>
                 <div class="fs-5">Total Jasa: <strong id="grandJasa">Rp 0</strong></div>
+                <div class="d-flex justify-content-end align-items-center gap-2 my-2">
+                    <label class="form-label mb-0" for="diskon">Diskon (Rp)</label>
+                    <input type="number" id="diskon" class="form-control form-control-sm text-end" value="0" min="0" style="width:150px">
+                </div>
                 <div class="fs-4 text-primary">Grand Total: <strong id="grandTotal">Rp 0</strong></div>
             </div>
         </div>
@@ -184,19 +188,22 @@ $(document).ready(function () {
     function hitungTotal() {
         let tb = 0, tj = 0;
         $('#tabelBarang tbody tr[data-id]').each(function () {
-            const harga = parseFloat($(this).attr('data-harga')) || 0;
+            const harga = parseFloat($(this).find('.harga').val()) || 0;
             const qty   = parseInt($(this).find('.qty').val()) || 0;
             tb += harga * qty;
         });
         $('#tabelJasa tbody tr[data-id]').each(function () {
-            const harga = parseFloat($(this).attr('data-harga')) || 0;
+            const harga = parseFloat($(this).find('.harga-jasa').val()) || 0;
             const qty   = parseInt($(this).find('.qty-jasa').val()) || 0;
             tj += harga * qty;
         });
+        const diskon = parseFloat($('#diskon').val()) || 0;
         $('#totalBarang, #grandBarang').text(fmt(tb));
         $('#totalJasa, #grandJasa').text(fmt(tj));
-        $('#grandTotal').text(fmt(tb + tj));
+        $('#grandTotal').text(fmt(tb + tj - diskon));
     }
+
+    $('#diskon').on('input', hitungTotal);
 
     // ====== BARANG SELECT2 ======
     Swal.fire({ title: 'Memuat data barang...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -246,9 +253,9 @@ $(document).ready(function () {
 
         const tr = $(`
             <tr data-id="${item.id_barang}" data-kode="${item.kode_barang}" data-nama="${item.nama_barang}"
-                data-harga="${item.harga}" data-harga-kulak="${item.harga_kulak ?? 0}" data-stok="${item.stok}">
+                data-harga-kulak="${item.harga_kulak ?? 0}" data-stok="${item.stok}">
                 <td class="text-start">${item.kode_barang} - ${item.nama_barang}</td>
-                <td class="harga">${fmt(item.harga)}</td>
+                <td><input type="number" value="${item.harga}" min="0" class="form-control form-control-sm harga text-end" style="width:110px"></td>
                 <td>${item.stok}</td>
                 <td><input type="number" value="1" min="1" max="${item.stok}" class="form-control form-control-sm qty text-center"></td>
                 <td class="sub" data-val="${item.harga}">${fmt(item.harga)}</td>
@@ -260,12 +267,12 @@ $(document).ready(function () {
         document.getElementById('beep').play();
     }
 
-    $('#tabelBarang').on('input', '.qty', function () {
+    $('#tabelBarang').on('input', '.qty, .harga', function () {
         updateBarangRow($(this).closest('tr'));
     });
 
     function updateBarangRow(tr) {
-        const harga = parseFloat(tr.attr('data-harga')) || 0;
+        const harga = parseFloat(tr.find('.harga').val()) || 0;
         const qty   = parseInt(tr.find('.qty').val()) || 1;
         const stok  = parseInt(tr.attr('data-stok'));
 
@@ -360,9 +367,9 @@ $(document).ready(function () {
         const badge = item.is_manual ? ' <span class="badge bg-warning text-dark ms-1">manual</span>' : '';
         const tr = $(`
             <tr data-id="${rowId}" data-kode="${item.kode_jasa ?? ''}" data-nama="${item.nama_jasa}"
-                data-harga="${item.harga}" data-manual="${isManual}">
+                data-manual="${isManual}">
                 <td class="text-start">${item.kode_jasa ? item.kode_jasa + ' - ' : ''}${item.nama_jasa}${badge}</td>
-                <td>${fmt(item.harga)}</td>
+                <td><input type="number" value="${item.harga}" min="0" class="form-control form-control-sm harga-jasa text-end" style="width:110px"></td>
                 <td><input type="number" value="1" min="1" class="form-control form-control-sm qty-jasa text-center"></td>
                 <td class="sub-jasa" data-val="${item.harga}">${fmt(item.harga)}</td>
                 <td><button type="button" class="btn btn-sm btn-danger del-jasa"><i class="fa-solid fa-trash"></i></button></td>
@@ -392,12 +399,12 @@ $(document).ready(function () {
         if (e.which === 13) $('#btnAddManualJasa').trigger('click');
     });
 
-    $('#tabelJasa').on('input', '.qty-jasa', function () {
+    $('#tabelJasa').on('input', '.qty-jasa, .harga-jasa', function () {
         updateJasaRow($(this).closest('tr'));
     });
 
     function updateJasaRow(tr) {
-        const harga = parseFloat(tr.attr('data-harga')) || 0;
+        const harga = parseFloat(tr.find('.harga-jasa').val()) || 0;
         const qty   = parseInt(tr.find('.qty-jasa').val()) || 1;
         const sub   = harga * qty;
         tr.find('.sub-jasa').data('val', sub).text(fmt(sub));
@@ -417,7 +424,7 @@ $(document).ready(function () {
         const barangItems = [];
         $('#tabelBarang tbody tr[data-id]').each(function () {
             const tr    = $(this);
-            const harga = parseFloat(tr.attr('data-harga')) || 0;
+            const harga = parseFloat(tr.find('.harga').val()) || 0;
             const qty   = parseInt(tr.find('.qty').val()) || 0;
             barangItems.push({
                 id_barang:   tr.attr('data-id'),
@@ -434,7 +441,7 @@ $(document).ready(function () {
         $('#tabelJasa tbody tr[data-id]').each(function () {
             const tr       = $(this);
             const isManual = tr.attr('data-manual') == '1';
-            const harga    = parseFloat(tr.attr('data-harga')) || 0;
+            const harga    = parseFloat(tr.find('.harga-jasa').val()) || 0;
             const qty      = parseInt(tr.find('.qty-jasa').val()) || 0;
             jasaItems.push({
                 id_jasa:   isManual ? null : tr.attr('data-id'),
@@ -456,6 +463,7 @@ $(document).ready(function () {
             catatan:            $('#catatan').val().trim(),
             status:             status,
             metode_pembayaran:  $('input[name="metode_pembayaran"]:checked').val(),
+            diskon:             parseFloat($('#diskon').val()) || 0,
             barang_items:       JSON.stringify(barangItems),
             jasa_items:         JSON.stringify(jasaItems),
             _token:             '{{ csrf_token() }}',

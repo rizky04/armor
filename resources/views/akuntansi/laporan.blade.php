@@ -43,18 +43,18 @@
         <div class="text-muted small" id="periodeLabel"></div>
     </div>
 
-    <!-- ===== 4 CARD UTAMA ===== -->
+    <!-- ===== 4 BAR UTAMA ===== -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="text-muted small mb-1">Total Omzet</div>
+                            <div class="text-muted small mb-1">1. Total Omzet Kotor</div>
                             <div class="fs-5 fw-bold text-primary" id="cOmzet">Rp 0</div>
                             <div class="mt-2 small">
-                                <div>Service Motor: <span class="fw-semibold" id="cOmzetTrx">Rp 0</span></div>
-                                <div>Penjualan Barang: <span class="fw-semibold" id="cOmzetPjl">Rp 0</span></div>
+                                <div>Showroom (Barang+Jasa): <span class="fw-semibold" id="cOmzetTrx">Rp 0</span></div>
+                                <div>Penjualan Barang (Platform): <span class="fw-semibold" id="cOmzetPjl">Rp 0</span></div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chart-line fa-2x text-primary opacity-25 mt-1"></i>
@@ -67,11 +67,13 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="text-muted small mb-1">Total Modal Barang</div>
+                            <div class="text-muted small mb-1">2. Total Potongan & Modal Barang</div>
                             <div class="fs-5 fw-bold text-warning" id="cModal">Rp 0</div>
                             <div class="mt-2 small">
-                                <div>Modal Transaksi: <span class="fw-semibold" id="cModalTrx">Rp 0</span></div>
+                                <div>Modal Showroom: <span class="fw-semibold" id="cModalTrx">Rp 0</span></div>
                                 <div>Modal Platform: <span class="fw-semibold" id="cModalPjl">Rp 0</span></div>
+                                <div>Biaya Platform: <span class="fw-semibold" id="cBiayaPlatform">Rp 0</span></div>
+                                <div>Diskon Showroom: <span class="fw-semibold" id="cDiskonShowroom">Rp 0</span></div>
                             </div>
                         </div>
                         <i class="fa-solid fa-boxes-stacked fa-2x text-warning opacity-25 mt-1"></i>
@@ -84,7 +86,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="text-muted small mb-1">Total Pengeluaran</div>
+                            <div class="text-muted small mb-1">3. Total Pengeluaran</div>
                             <div class="fs-5 fw-bold text-danger" id="cPengeluaran">Rp 0</div>
                             <div class="mt-2 small">
                                 <div>Operasional: <span class="fw-semibold" id="cPengeluaranOps">Rp 0</span></div>
@@ -101,9 +103,9 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="text-muted small mb-1">Laba Bersih</div>
+                            <div class="text-muted small mb-1">4. Laba Bersih</div>
                             <div class="fs-4 fw-bold" id="cLaba">Rp 0</div>
-                            <div class="mt-2 small text-muted">Keuntungan − Pengeluaran</div>
+                            <div class="mt-2 small text-muted">Omzet Kotor − Potongan&Modal − Pengeluaran</div>
                         </div>
                         <i class="fa-solid fa-sack-dollar fa-2x opacity-25 mt-1" id="iconLaba"></i>
                     </div>
@@ -302,21 +304,31 @@ $('#btnLaporan').on('click', function () {
     }, function (res) {
         const trx = res.transaksi_motor;
         const pjl = res.penjualan_platform;
-        const gab = res.gabungan;
         const pg  = res.pengeluaran;
         const pb  = res.pembelian_barang;
-        const lb  = res.laba_bersih;
+        const ok  = res.omzet_kotor;
+        const pm  = res.potongan_modal;
+        const ps  = res.pengeluaran_semua;
+        const lb  = res.laba_bersih_baru;
 
-        // ===== CARDS =====
-        $('#cOmzet').text(fmt(gab.total_omzet));
-        $('#cOmzetTrx').text(fmt(trx.omzet_barang + trx.omzet_jasa));
-        $('#cOmzetPjl').text(fmt(pjl.omzet));
-        $('#cModal').text(fmt(gab.total_modal));
-        $('#cModalTrx').text(fmt(trx.modal));
-        $('#cModalPjl').text(fmt(pjl.modal));
-        $('#cPengeluaran').text(fmt(pg.total + pb.total));
-        $('#cPengeluaranOps').text(fmt(pg.total));
-        $('#cPengeluaranPembelian').text(fmt(pb.total));
+        // ===== BAR 1: OMZET KOTOR =====
+        $('#cOmzet').text(fmt(ok.total));
+        $('#cOmzetTrx').text(fmt(ok.showroom));
+        $('#cOmzetPjl').text(fmt(ok.platform));
+
+        // ===== BAR 2: POTONGAN & MODAL BARANG =====
+        $('#cModal').text(fmt(pm.total));
+        $('#cModalTrx').text(fmt(pm.modal_showroom));
+        $('#cModalPjl').text(fmt(pm.modal_platform));
+        $('#cBiayaPlatform').text(fmt(pm.biaya_platform));
+        $('#cDiskonShowroom').text(fmt(pm.diskon_showroom));
+
+        // ===== BAR 3: PENGELUARAN =====
+        $('#cPengeluaran').text(fmt(ps.total));
+        $('#cPengeluaranOps').text(fmt(ps.operasional));
+        $('#cPengeluaranPembelian').text(fmt(ps.pembelian_barang));
+
+        // ===== BAR 4: LABA BERSIH =====
         setLaba(lb);
 
         // ===== TRANSAKSI MOTOR =====
@@ -357,9 +369,9 @@ $('#btnLaporan').on('click', function () {
         $('#dTotalPengeluaran').text(fmt(pg.total));
 
         // ===== LABA BERSIH BESAR =====
-        $('#rumusLabel').text('Keuntungan Kotor − Pengeluaran Operasional − Pembelian Barang = Laba Bersih');
+        $('#rumusLabel').text('Total Omzet Kotor − Total Potongan & Modal Barang − Total Pengeluaran = Laba Bersih');
         $('#rumusDetail').html(
-            `${fmt(gab.total_keuntungan)} &minus; ${fmt(pg.total)} &minus; ${fmt(pb.total)} = <strong>${fmt(lb)}</strong>`
+            `${fmt(ok.total)} &minus; ${fmt(pm.total)} &minus; ${fmt(ps.total)} = <strong>${fmt(lb)}</strong>`
         );
 
         // ===== DETAIL PEMBELIAN BARANG =====

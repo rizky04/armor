@@ -89,6 +89,7 @@ class TransaksiMotorController extends Controller
                 $totalJasa += (float)$item['subtotal'];
             }
 
+            $diskon = (float)($request->diskon ?? 0);
             $status = $request->status ?? 'selesai';
             $reduce = $status !== 'dibatalkan'; // draft & selesai memotong stok
 
@@ -105,7 +106,8 @@ class TransaksiMotorController extends Controller
                 'metode_pembayaran'  => $request->metode_pembayaran ?? 'cash',
                 'total_barang'    => $totalBarang,
                 'total_jasa'      => $totalJasa,
-                'total'           => $totalBarang + $totalJasa,
+                'diskon'          => $diskon,
+                'total'           => $totalBarang + $totalJasa - $diskon,
                 'created_by'      => Auth::id(),
             ]);
 
@@ -215,6 +217,7 @@ class TransaksiMotorController extends Controller
                 $totalJasa += (float)$item['subtotal'];
             }
 
+            $diskon    = (float)($request->diskon ?? 0);
             $newStatus = $request->status ?? 'draft';
             $reduce    = $newStatus !== 'dibatalkan'; // draft & selesai memotong stok
 
@@ -230,7 +233,8 @@ class TransaksiMotorController extends Controller
                 'metode_pembayaran'=> $request->metode_pembayaran ?? 'cash',
                 'total_barang'     => $totalBarang,
                 'total_jasa'       => $totalJasa,
-                'total'            => $totalBarang + $totalJasa,
+                'diskon'           => $diskon,
+                'total'            => $totalBarang + $totalJasa - $diskon,
             ]);
 
             foreach ($barangItems as $item) {
@@ -343,10 +347,11 @@ class TransaksiMotorController extends Controller
         $totalModalBarang    = 0;
         $totalUntungBarang   = 0;
         $totalUntungJasa     = 0;
+        $totalDiskon         = 0;
 
         $rows = $data->map(function ($trx) use (
             &$totalOmzetBarang, &$totalOmzetJasa,
-            &$totalModalBarang, &$totalUntungBarang, &$totalUntungJasa
+            &$totalModalBarang, &$totalUntungBarang, &$totalUntungJasa, &$totalDiskon
         ) {
             $omzetBarang  = 0;
             $modalBarang  = 0;
@@ -362,31 +367,41 @@ class TransaksiMotorController extends Controller
             $omzetJasa  = $trx->total_jasa;
             // Jasa = 100% keuntungan (tidak ada modal)
             $untungJasa = $omzetJasa;
+            $diskon     = (float)$trx->diskon;
 
             $totalOmzetBarang  += $omzetBarang;
             $totalOmzetJasa    += $omzetJasa;
             $totalModalBarang  += $modalBarang;
             $totalUntungBarang += $untungBarang;
             $totalUntungJasa   += $untungJasa;
+            $totalDiskon       += $diskon;
 
             return [
-                'id'              => $trx->id,
-                'nomor_transaksi' => $trx->nomor_transaksi,
-                'tanggal'         => $trx->tanggal,
-                'nama_customer'   => $trx->nama_customer,
-                'plat_nomor'      => $trx->plat_nomor,
-                'nama_motor'      => $trx->nama_motor,
-                'barangs'         => $trx->barangs,
-                'jasas'           => $trx->jasas,
-                'omzet_barang'    => $omzetBarang,
-                'modal_barang'    => $modalBarang,
-                'untung_barang'   => $untungBarang,
-                'omzet_jasa'      => $omzetJasa,
-                'untung_jasa'     => $untungJasa,
-                'total'           => $trx->total,
-                'keuntungan'      => $untungBarang + $untungJasa,
+                'id'                => $trx->id,
+                'nomor_transaksi'   => $trx->nomor_transaksi,
+                'tanggal'           => $trx->tanggal,
+                'nama_customer'     => $trx->nama_customer,
+                'plat_nomor'        => $trx->plat_nomor,
+                'nama_motor'        => $trx->nama_motor,
+                'metode_pembayaran' => $trx->metode_pembayaran,
+                'barangs'           => $trx->barangs,
+                'jasas'             => $trx->jasas,
+                'omzet_barang'      => $omzetBarang,
+                'modal_barang'      => $modalBarang,
+                'untung_barang'     => $untungBarang,
+                'omzet_jasa'        => $omzetJasa,
+                'untung_jasa'       => $untungJasa,
+                'diskon'            => $diskon,
+                'total'             => $trx->total,
+                'keuntungan'        => $untungBarang + $untungJasa - $diskon,
             ];
         });
+
+        // Rekap per metode pembayaran (buat cek total cash/qris/dll per periode)
+        $perMetode = $data->groupBy('metode_pembayaran')->map(fn($g) => [
+            'jumlah' => $g->count(),
+            'total'  => $g->sum('total'),
+        ]);
 
         return response()->json([
             'data'               => $rows,
@@ -395,8 +410,10 @@ class TransaksiMotorController extends Controller
             'total_modal'        => $totalModalBarang,
             'total_untung_barang'=> $totalUntungBarang,
             'total_untung_jasa'  => $totalUntungJasa,
+            'total_diskon'       => $totalDiskon,
+            'per_metode'         => $perMetode,
             'grand_omzet'        => $totalOmzetBarang + $totalOmzetJasa,
-            'grand_keuntungan'   => $totalUntungBarang + $totalUntungJasa,
+            'grand_keuntungan'   => $totalUntungBarang + $totalUntungJasa - $totalDiskon,
         ]);
     }
 }

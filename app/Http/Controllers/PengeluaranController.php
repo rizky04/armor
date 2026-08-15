@@ -93,6 +93,7 @@ class PengeluaranController extends Controller
 
         $trxOmzetBarang = $transaksi->sum('total_barang');
         $trxOmzetJasa   = $transaksi->sum('total_jasa');
+        $trxDiskon      = $transaksi->sum('diskon');
         $trxModal       = 0;
         $trxUntungBarang = 0;
         foreach ($transaksi as $trx) {
@@ -103,7 +104,7 @@ class PengeluaranController extends Controller
             }
         }
         $trxUntungJasa   = $trxOmzetJasa;
-        $trxKeuntungan   = $trxUntungBarang + $trxUntungJasa;
+        $trxKeuntungan   = $trxUntungBarang + $trxUntungJasa - $trxDiskon;
 
         // ===== SUMBER 2: Penjualan Platform (Shopee, dll) =====
         $pjlQuery = PenjualanPlatform::where('status', 'selesai');
@@ -146,6 +147,19 @@ class PengeluaranController extends Controller
 
         // ===== LABA BERSIH =====
         $labaBersih = $totalKeuntungan - $totalPengeluaran - $totalPembelian;
+
+        // ===== 4 BAR STRUKTUR BARU =====
+        // 1. Total Omzet Kotor = omzet showroom (barang+jasa) + omzet platform, sebelum potongan apapun
+        $totalOmzetKotor = $totalOmzet;
+
+        // 2. Total Potongan & Modal Barang = modal showroom + modal platform + biaya platform + diskon showroom
+        $totalPotonganModal = $trxModal + $pjlModal + $pjlTotalBiaya + $trxDiskon;
+
+        // 3. Total Pengeluaran = operasional (akuntansi) + pembelian barang (stok masuk)
+        $totalPengeluaranSemua = $totalPengeluaran + $totalPembelian;
+
+        // 4. Laba Bersih = Omzet Kotor - Potongan&Modal - Pengeluaran (identik dgn $labaBersih di atas)
+        $labaBersihBaru = $totalOmzetKotor - $totalPotonganModal - $totalPengeluaranSemua;
 
         return response()->json([
             'transaksi_motor' => [
@@ -190,6 +204,26 @@ class PengeluaranController extends Controller
                 ]),
             ],
             'laba_bersih' => $labaBersih,
+
+            // ===== STRUKTUR 4 BAR (Omzet Kotor > Potongan&Modal > Pengeluaran > Laba Bersih) =====
+            'omzet_kotor' => [
+                'showroom' => $trxOmzetBarang + $trxOmzetJasa,
+                'platform' => $pjlOmzet,
+                'total'    => $totalOmzetKotor,
+            ],
+            'potongan_modal' => [
+                'modal_showroom' => $trxModal,
+                'modal_platform' => $pjlModal,
+                'biaya_platform' => $pjlTotalBiaya,
+                'diskon_showroom'=> $trxDiskon,
+                'total'          => $totalPotonganModal,
+            ],
+            'pengeluaran_semua' => [
+                'operasional'     => $totalPengeluaran,
+                'pembelian_barang'=> $totalPembelian,
+                'total'           => $totalPengeluaranSemua,
+            ],
+            'laba_bersih_baru' => $labaBersihBaru,
         ]);
     }
 }

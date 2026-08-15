@@ -71,7 +71,7 @@
 
     <!-- RINCIAN KEUNTUNGAN -->
     <div class="row g-3 mb-3 no-print">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card border-0 bg-light">
                 <div class="card-body py-2 px-3">
                     <small class="text-muted">Keuntungan Barang</small>
@@ -80,13 +80,45 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card border-0 bg-light">
                 <div class="card-body py-2 px-3">
                     <small class="text-muted">Keuntungan Jasa</small>
                     <div class="fw-bold text-success" id="sumUntungJasa">Rp 0</div>
                     <small class="text-muted">(100% dari pendapatan jasa)</small>
                 </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2 px-3">
+                    <small class="text-muted">Total Diskon</small>
+                    <div class="fw-bold text-danger" id="sumDiskon">Rp 0</div>
+                    <small class="text-muted">Potongan harga ke customer</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BREAKDOWN PER METODE PEMBAYARAN -->
+    <div class="card mb-3">
+        <div class="card-header bg-light fw-bold">
+            <i class="fa-solid fa-wallet me-1"></i> Rekap per Metode Pembayaran
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0 text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Metode</th>
+                            <th>Jumlah Transaksi</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyMetode">
+                        <tr><td colspan="3" class="text-muted py-2">-</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -208,6 +240,26 @@ $('#btnLaporan').on('click', function () {
         $('#sumUntung').text(fmt(res.grand_keuntungan));
         $('#sumUntungBarang').text(fmt(res.total_untung_barang));
         $('#sumUntungJasa').text(fmt(res.total_untung_jasa));
+        $('#sumDiskon').text(fmt(res.total_diskon));
+
+        // ===== REKAP PER METODE PEMBAYARAN =====
+        const metodeLabel = { cash: 'Cash', transfer: 'Transfer', qris: 'QRIS', debit: 'Debit' };
+        const bodyMetode = $('#bodyMetode');
+        bodyMetode.empty();
+        const metodeEntries = Object.entries(res.per_metode || {});
+        if (!metodeEntries.length) {
+            bodyMetode.append('<tr><td colspan="3" class="text-muted py-2">Tidak ada data.</td></tr>');
+        } else {
+            metodeEntries.forEach(([kode, m]) => {
+                bodyMetode.append(`
+                    <tr>
+                        <td>${metodeLabel[kode] ?? kode}</td>
+                        <td>${m.jumlah}</td>
+                        <td class="text-end fw-semibold">${fmt(m.total)}</td>
+                    </tr>
+                `);
+            });
+        }
 
         let periode = '';
         if (dari && sampai) periode = dari + ' s/d ' + sampai;

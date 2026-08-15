@@ -22,6 +22,7 @@ class TransaksiMotor extends Model
         'metode_pembayaran',
         'total_barang',
         'total_jasa',
+        'diskon',
         'total',
         'created_by',
     ];

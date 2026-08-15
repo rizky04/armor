@@ -175,6 +175,12 @@
                     <td class="pe-4">Total Jasa</td>
                     <td class="text-end fw-bold">Rp {{ number_format($transaksi->total_jasa, 0, ',', '.') }}</td>
                 </tr>
+                @if($transaksi->diskon > 0)
+                <tr>
+                    <td class="pe-4 text-danger">Diskon</td>
+                    <td class="text-end fw-bold text-danger">− Rp {{ number_format($transaksi->diskon, 0, ',', '.') }}</td>
+                </tr>
+                @endif
                 <tr class="border-top">
                     <td class="pe-4 fs-5 text-primary fw-bold">Grand Total</td>
                     <td class="text-end fs-5 text-primary fw-bold">Rp {{ number_format($transaksi->total, 0, ',', '.') }}</td>
